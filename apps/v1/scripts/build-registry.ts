@@ -1,5 +1,5 @@
-import * as fs from 'fs';
-import * as path from 'path';
+import { readFileSync, writeFileSync, mkdirSync } from 'fs';
+import { join } from 'path';
 import { availableStyles } from '../registry/config/styles';
 import { availableColors, colorValues } from '../registry/config/colors';
 
@@ -24,22 +24,22 @@ async function buildRegistry() {
     console.log('🏗️  Building registry...');
 
     // Ensure output directory exists
-    const outputDir = path.join(process.cwd(), 'public/r');
-    fs.mkdirSync(outputDir, { recursive: true });
-    fs.mkdirSync(path.join(outputDir, 'styles'), { recursive: true });
-    fs.mkdirSync(path.join(outputDir, 'styles/default'), { recursive: true });
-    fs.mkdirSync(path.join(outputDir, 'colors'), { recursive: true });
+    const outputDir = join(process.cwd(), 'public/r');
+    mkdirSync(outputDir, { recursive: true });
+    mkdirSync(join(outputDir, 'styles'), { recursive: true });
+    mkdirSync(join(outputDir, 'styles/default'), { recursive: true });
+    mkdirSync(join(outputDir, 'colors'), { recursive: true });
 
     // 1. Build styles index
-    fs.writeFileSync(
-        path.join(outputDir, 'styles/index.json'),
+    writeFileSync(
+        join(outputDir, 'styles/index.json'),
         JSON.stringify(availableStyles, null, 2)
     );
     console.log('✓ Built styles index');
 
     // 2. Build colors index
-    fs.writeFileSync(
-        path.join(outputDir, 'colors/index.json'),
+    writeFileSync(
+        join(outputDir, 'colors/index.json'),
         JSON.stringify(availableColors, null, 2)
     );
     console.log('✓ Built colors index');
@@ -74,8 +74,8 @@ async function buildRegistry() {
             )
         };
 
-        fs.writeFileSync(
-            path.join(outputDir, 'colors', `${colorName}.json`),
+        writeFileSync(
+            join(outputDir, 'colors', `${colorName}.json`),
             JSON.stringify(colorData, null, 2)
         );
     });
@@ -99,13 +99,13 @@ async function buildRegistryComponents() {
         files: [
             {
                 path: "assets/styles/_variables.scss",
-                content: fs.readFileSync(path.join(process.cwd(), 'registry/styles/_variables.scss'), 'utf-8'),
+                content: readFileSync(join(process.cwd(), 'registry/styles/_variables.scss'), 'utf-8'),
                 type: "registry:style",
                 target: "assets/styles/_variables.scss"
             },
             {
                 path: "assets/styles/_mixins.scss",
-                content: fs.readFileSync(path.join(process.cwd(), 'registry/styles/_mixins.scss'), 'utf-8'),
+                content: readFileSync(join(process.cwd(), 'registry/styles/_mixins.scss'), 'utf-8'),
                 type: "registry:style",
                 target: "assets/styles/_mixins.scss"
             }
@@ -132,8 +132,8 @@ async function buildRegistryComponents() {
         }
     };
 
-    fs.writeFileSync(
-        path.join(process.cwd(), 'public/r/styles/default/index.json'),
+    writeFileSync(
+        join(process.cwd(), 'public/r/styles/default/index.json'),
         JSON.stringify(indexItem, null, 2)
     );
     console.log('✓ Built index style');
