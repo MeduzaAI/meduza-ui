@@ -19,33 +19,33 @@ Create a working registry with basic documentation and a CLI that can `init` and
 ### MVP Implementation Steps
 
 #### Step 1: Registry Foundation
-- [01 - Registry App Setup](./01-registry-app-setup.md)
-- [02 - Registry Schema & Build System](./02-registry-schema-build.md)
+- [x] [01 - Registry App Setup](./01-registry-app-setup.md)
+- [ ] [02 - Registry Schema & Build System](./02-registry-schema-build.md)
 
 #### Step 2: Init Support
-- [03 - Init Requirements & Base Components](./03-init-requirements.md)
+- [ ] [03 - Init Requirements & Base Components](./03-init-requirements.md)
 
 #### Step 3: First Component
-- [04 - First Component](./04-first-component-docs.md)
+- [ ] [04 - First Component](./04-first-component-docs.md)
 
 #### Step 4: Documentation System
-- [05 - Documentation & Markdown Support](./05-documentation-system.md)
+- [ ] [05 - Documentation & Markdown Support](./05-documentation-system.md)
 
 #### Step 5: CLI Foundation
-- [06 - CLI Package Setup](./06-cli-package-setup.md)
+- [ ] [06 - CLI Package Setup](./06-cli-package-setup.md)
 
 #### Step 6: CLI Init Command
-- [07 - CLI Init Command](./07-cli-init-command.md)
+- [ ] [07 - CLI Init Command](./07-cli-init-command.md)
 
 #### Step 7: CLI Add Command
-- [08 - CLI Add Command](./08-cli-add-command.md)
+- [ ] [08 - CLI Add Command](./08-cli-add-command.md)
 
 #### Step 8: MVP Launch
-- [09 - MVP Testing & Deployment](./09-mvp-testing-deployment.md)
+- [ ] [09 - MVP Testing & Deployment](./09-mvp-testing-deployment.md)
 
 ### Post-MVP: Iterative Development
-- [10 - Component Development Process](./10-component-development-process.md)
-- [11 - Release Strategy](./11-release-strategy.md)
+- [ ] [10 - Component Development Process](./10-component-development-process.md)
+- [ ] [11 - Release Strategy](./11-release-strategy.md)
 
 ## Quick Start for Developers
 

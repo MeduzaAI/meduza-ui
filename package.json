@@ -1,0 +1,19 @@
+{
+    "name": "meduza-ui-monorepo",
+    "version": "0.0.1",
+    "private": true,
+    "type": "module",
+    "workspaces": [
+        "apps/*",
+        "packages/*"
+    ],
+    "scripts": {
+        "dev": "pnpm --filter=v1 dev",
+        "build": "pnpm --filter=v1 build",
+        "build:registry": "pnpm --filter=v1 build:registry"
+    },
+    "packageManager": "pnpm@9.0.6",
+    "devDependencies": {
+        "typescript": "^5.4.5"
+    }
+}
