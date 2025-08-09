@@ -1,0 +1,41 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build outputs
+dist/
+build/
+.output/
+.nuxt/
+.next/
+.turbo/
+coverage/
+
+# Generated files
+*.d.ts
+auto-imports.d.ts
+components.d.ts
+pnpm-lock.yaml
+
+# Templates (they have their own formatting)
+templates/
+
+# Binary files
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.svg
+*.ico
+*.woff
+*.woff2
+*.ttf
+*.eot
+
+# Logs
+*.log
+
+# Cache
+.cache/
+.temp/
+.tmp/

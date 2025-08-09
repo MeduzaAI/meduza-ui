@@ -1,0 +1,37 @@
+{
+  "name": "meduza-ui",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Vue.js component library with SCSS and BEM methodology for MeduzaAI",
+  "type": "module",
+  "packageManager": "pnpm@9.15.0",
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev --parallel",
+    "test": "turbo run test",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "lint:inspect": "pnpx @eslint/config-inspector --config eslint.config.js",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "turbo run typecheck",
+    "cli:dev": "pnpm --filter=@meduza-ui/cli dev",
+    "docs:dev": "pnpm --filter=docs dev",
+    "playground:dev": "pnpm --filter=playground dev",
+    "clean": "turbo run clean",
+    "clean:node_modules": "rm -rf node_modules && rm -rf packages/*/node_modules && rm -rf apps/*/node_modules"
+  },
+  "devDependencies": {
+    "eslint": "^9.16.0",
+    "eslint-config-fans": "^1.2.0",
+    "prettier": "^3.3.3",
+    "turbo": "^2.3.0",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  },
+  "workspaces": ["packages/*", "apps/*", "templates/*"]
+}
