@@ -1,58 +1,94 @@
-# Meduza-UI Specifications
+# Meduza UI - Implementation Specs
 
-This directory contains detailed specifications for building the MeduzaAI component library system,
-following the shadcn/ui architecture but adapted for Vue.js + SCSS with BEM methodology.
+A Vue.js component library with SCSS styling, inspired by shadcn/ui's copy-paste philosophy.
 
 ## Project Overview
 
-**Name**: meduza-ui  
-**Organization**: MeduzaAI  
-**CLI Package**: `@meduza-ui/cli`  
-**Installation**: `npx @meduza-ui/cli@latest`
+Meduza UI is a Vue.js component library that provides beautifully designed, accessible components that developers copy directly into their projects. Unlike traditional npm packages, components are copied and owned by the developer, providing full customization control.
 
-## Core Principles
+## Core Architecture
 
-1. **BEM Methodology**: All components follow Block-Element-Modifier naming
-2. **Pixel-based Design**: Use pixels instead of rem, all spacing in 4px increments
-3. **Interface over Types**: Use TypeScript interfaces and enums for better structure
-4. **Composition API Only**: Vue 3 Composition API exclusively
-5. **Copy-Paste Philosophy**: Components are copied to user projects, not installed as dependencies
+- **CLI Tool** (`packages/cli`) - Project initialization and component management
+- **Documentation + Registry** (`apps/v1`) - Documentation site, component authoring, and distribution
 
-## Specifications Index
+## Implementation Plan - MVP First
 
-1. [Project Structure](./01-project-structure.md) - Overall monorepo and package organization
-2. [BEM ClassName Utility](./02-bem-classname-utility.md) - useClassName helper function design
-3. [CLI Package](./03-cli-package.md) - Command-line interface specification
-4. [Component Registry](./04-component-registry.md) - Registry schema and structure
-5. [SCSS System](./05-scss-system.md) - Styling and theming architecture
-6. [Vue Components](./06-vue-components.md) - Component development standards
-7. [Documentation Site](./07-documentation-site.md) - VitePress documentation website specification
-8. [Framework Detection](./08-framework-detection.md) - Vue project type detection
-9. [Build System](./09-build-system.md) - Build and deployment pipeline
-10. [Testing Strategy](./10-testing-strategy.md) - Testing approach and tools
+### MVP Goal
+Create a working registry with basic documentation and a CLI that can `init` and `add` components.
 
-## Implementation Timeline
+### MVP Implementation Steps
 
-**Phase 1**: Core Infrastructure (Weeks 1-2)
+#### Step 1: Registry Foundation
+- [01 - Registry App Setup](./01-registry-app-setup.md)
+- [02 - Registry Schema & Build System](./02-registry-schema-build.md)
 
-- Project structure setup
-- BEM className utility
-- Basic CLI package
+#### Step 2: Init Support
+- [03 - Init Requirements & Base Components](./03-init-requirements.md)
 
-**Phase 2**: Component System (Weeks 3-4)
+#### Step 3: First Component
+- [04 - First Component](./04-first-component-docs.md)
 
-- Registry schema
-- SCSS theming system
-- First 5 UI components
+#### Step 4: Documentation System
+- [05 - Documentation & Markdown Support](./05-documentation-system.md)
 
-**Phase 3**: Documentation & Polish (Weeks 5-6)
+#### Step 5: CLI Foundation
+- [06 - CLI Package Setup](./06-cli-package-setup.md)
 
-- Documentation site
-- Testing setup
-- CLI refinements
+#### Step 6: CLI Init Command
+- [07 - CLI Init Command](./07-cli-init-command.md)
 
-**Phase 4**: Launch Preparation (Week 7)
+#### Step 7: CLI Add Command
+- [08 - CLI Add Command](./08-cli-add-command.md)
 
-- Package publishing
-- Documentation completion
-- Examples and templates
+#### Step 8: MVP Launch
+- [09 - MVP Testing & Deployment](./09-mvp-testing-deployment.md)
+
+### Post-MVP: Iterative Development
+- [10 - Component Development Process](./10-component-development-process.md)
+- [11 - Release Strategy](./11-release-strategy.md)
+
+## Quick Start for Developers
+
+1. Read the specs in order
+2. Each spec is self-contained with clear deliverables
+3. Refer to shadcn/ui codebase for implementation patterns
+4. Focus on Vue.js + SCSS instead of React + Tailwind
+
+## MVP Commands Reference
+
+```bash
+# MVP User-facing commands
+npx meduza-ui init     # Initialize Vue project
+npx meduza-ui add button    # Add button component
+
+# MVP Development commands
+pnpm dev              # Start registry/docs app (apps/v1)
+pnpm build:registry   # Build component registry
+pnpm build:cli        # Build CLI package
+```
+
+## What the MVP Includes
+
+### Registry Features
+- Basic registry schema for Vue components with SCSS
+- Build system that generates JSON from Vue SFCs
+- Serves registry at `/r/` endpoint
+- Basic documentation pages
+
+### CLI Features  
+- `init` command: Detects Vue projects, sets up SCSS, creates config
+- `add` command: Fetches components from registry, installs dependencies
+
+### Components
+- Base style/theme system (for init)
+- One functional UI component (e.g., Button)
+- Component documentation page
+
+## Key Principles
+
+1. **Copy-Paste Philosophy**: Components are copied to user projects
+2. **Developer Ownership**: Users own and can modify components
+3. **Vue.js First**: Built specifically for Vue.js ecosystem
+4. **SCSS Styling**: Powerful styling with variables and mixins
+5. **Accessibility**: WCAG compliant components
+6. **TypeScript**: Full type safety throughout
