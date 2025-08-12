@@ -3,9 +3,10 @@ import { readFileSync } from "fs"
 import { join } from "path"
 import { fileURLToPath } from "url"
 
-// Import commands (will be implemented in subsequent specs)
-// import { init } from "@/commands/init"
-// import { add } from "@/commands/add"
+// Import commands
+import { build } from "@/commands/build"
+// import { init } from "@/commands/init"  - will be implemented in next spec
+// import { add } from "@/commands/add"     - will be implemented in future spec
 
 const __dirname = fileURLToPath(new URL(".", import.meta.url))
 
@@ -31,9 +32,12 @@ async function main() {
             "display the version number"
         )
 
-    // Commands will be added in subsequent specs
-    // program.addCommand(init)
-    // program.addCommand(add)
+    // Add commands
+    program.addCommand(build)
+
+    // Additional commands will be added in subsequent specs
+    // program.addCommand(init)  - next spec
+    // program.addCommand(add)   - future spec
 
     // For now, show help when no command is provided
     if (process.argv.length <= 2) {
