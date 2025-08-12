@@ -51,6 +51,12 @@ importers:
       glob:
         specifier: ^10.3.10
         version: 10.4.5
+      meduza-ui:
+        specifier: workspace:^
+        version: link:../../packages/cli
+      rimraf:
+        specifier: ^5.0.5
+        version: 5.0.10
       tsx:
         specifier: ^4.19.2
         version: 4.20.3
