@@ -4,7 +4,7 @@ import fg from "fast-glob"
 
 export interface ProjectInfo {
     framework: "vue" | "nuxt" | "vite" | "manual"
-    isSrcDir: boolean
+    baseDir: string // "src", "app", or "" for root
     isTypeScript: boolean
     packageManager: "npm" | "yarn" | "pnpm" | "bun"
     aliasPrefix: string
@@ -22,7 +22,8 @@ const PROJECT_IGNORE = [
 export async function getProjectInfo(cwd: string): Promise<ProjectInfo | null> {
     const [
         configFiles,
-        isSrcDir,
+        hasSrcDir,
+        hasAppDir,
         isTypeScript,
         packageManager,
         aliasPrefix,
@@ -36,44 +37,50 @@ export async function getProjectInfo(cwd: string): Promise<ProjectInfo | null> {
             }
         ),
         fs.pathExists(path.resolve(cwd, "src")),
+        fs.pathExists(path.resolve(cwd, "app")),
         isTypeScriptProject(cwd),
         getPackageManager(cwd),
         getAliasPrefix(cwd),
     ])
 
-    const type: ProjectInfo = {
-        framework: "manual",
-        isSrcDir,
+    let framework: ProjectInfo["framework"] = "manual"
+    let baseDir: string = ""
+
+    // Determine base directory based on framework and project structure
+    if (configFiles.find((file) => file.startsWith("nuxt.config."))) {
+        framework = "nuxt"
+        // For Nuxt, use app directory if it exists, otherwise root
+        baseDir = hasAppDir ? "app" : ""
+    } else if (hasSrcDir) {
+        // For other frameworks, use src directory if it exists
+        baseDir = "src"
+    }
+
+    // Vite detection (only override if not already detected as Nuxt)
+    if (framework === "manual" && configFiles.find((file) => file.startsWith("vite.config."))) {
+        framework = "vite"
+    }
+
+    // Vue CLI detection (check package.json for @vue/cli-service)
+    if (framework === "manual") {
+        const packageJsonPath = path.resolve(cwd, "package.json")
+        if (await fs.pathExists(packageJsonPath)) {
+            const packageJson = await fs.readJson(packageJsonPath)
+
+            if (packageJson.dependencies?.["@vue/cli-service"] ||
+                packageJson.devDependencies?.["@vue/cli-service"]) {
+                framework = "vue"
+            }
+        }
+    }
+
+    return {
+        framework,
+        baseDir,
         isTypeScript,
         packageManager,
         aliasPrefix,
     }
-
-    // Nuxt.js detection
-    if (configFiles.find((file) => file.startsWith("nuxt.config."))) {
-        type.framework = "nuxt"
-        return type
-    }
-
-    // Vite detection
-    if (configFiles.find((file) => file.startsWith("vite.config."))) {
-        type.framework = "vite"
-        return type
-    }
-
-    // Vue CLI detection (check package.json for @vue/cli-service)
-    const packageJsonPath = path.resolve(cwd, "package.json")
-    if (await fs.pathExists(packageJsonPath)) {
-        const packageJson = await fs.readJson(packageJsonPath)
-
-        if (packageJson.dependencies?.["@vue/cli-service"] ||
-            packageJson.devDependencies?.["@vue/cli-service"]) {
-            type.framework = "vue"
-            return type
-        }
-    }
-
-    return type
 }
 
 export async function isTypeScriptProject(cwd: string): Promise<boolean> {

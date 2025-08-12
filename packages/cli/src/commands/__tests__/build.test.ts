@@ -64,7 +64,8 @@ describe("build command", () => {
           files: [
             {
               path: "Button.vue",
-              type: "file" as const
+              type: "file" as const,
+              content: '<template><button><slot /></button></template>\n\n<script setup lang="ts">\n// Button component\n</script>\n\n<style lang="scss">\n.button {\n  padding: 0.5rem 1rem;\n}\n</style>'
             }
           ]
         }
@@ -77,7 +78,7 @@ describe("build command", () => {
       '<template><button><slot /></button></template>\n\n<script setup lang="ts">\n// Button component\n</script>\n\n<style lang="scss">\n.button {\n  padding: 0.5rem 1rem;\n}\n</style>'
     )
 
-    // Run build
+    // Run build - should succeed now
     await runBuild({
       cwd: tempDir,
       registryFile: "./registry.json",
@@ -150,7 +151,8 @@ describe("build command", () => {
           files: [
             {
               path: "NonExistent.vue",
-              type: "file" as const
+              type: "file" as const,
+              content: '<template><div>Non-existent component</div></template>'
             }
           ]
         }
@@ -186,7 +188,8 @@ describe("build command", () => {
           files: [
             {
               path: "components/Button.vue",
-              type: "file" as const
+              type: "file" as const,
+              content: '<template><button class="btn"><slot /></button></template>'
             }
           ],
           category: "form"
@@ -198,7 +201,8 @@ describe("build command", () => {
           files: [
             {
               path: "lib/utils.ts",
-              type: "file" as const
+              type: "file" as const,
+              content: 'export function cn(...classes: string[]) { return classes.join(" ") }'
             }
           ]
         }
@@ -284,15 +288,18 @@ describe("build command", () => {
           files: [
             {
               path: "components/ui/Card.vue",
-              type: "file" as const
+              type: "file" as const,
+              content: '<template><div class="card"><slot /></div></template>'
             },
             {
               path: "components/ui/card.scss",
-              type: "file" as const
+              type: "file" as const,
+              content: '.card { padding: 1rem; border-radius: 0.5rem; }'
             },
             {
               path: "types/card.ts",
-              type: "file" as const
+              type: "file" as const,
+              content: 'export interface CardProps { title?: string }'
             }
           ]
         }

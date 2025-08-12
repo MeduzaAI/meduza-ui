@@ -100,7 +100,7 @@ export type RawConfig = z.infer<typeof rawConfigSchema>;
 
 // Default configuration for Vue projects
 export const DEFAULT_REGISTRIES = {
-    "meduza-ui": "http://localhost:3000/r",
+    "meduza-ui": "https://meduza-ui.com/r",
 };
 
 export const DEFAULT_CONFIG: RawConfig = {

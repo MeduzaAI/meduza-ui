@@ -76,8 +76,15 @@ export async function resolveConfigPaths(
 async function resolveAlias(cwd: string, alias: string): Promise<string> {
     // Handle @ alias
     if (alias.startsWith("@/")) {
-        const srcPath = path.resolve(cwd, "src", alias.slice(2))
-        const rootPath = path.resolve(cwd, alias.slice(2))
+        const relativePath = alias.slice(2)
+        const srcPath = path.resolve(cwd, "src", relativePath)
+        const appPath = path.resolve(cwd, "app", relativePath)
+        const rootPath = path.resolve(cwd, relativePath)
+
+        // Check if app directory exists (Nuxt 4) and prefer it
+        if (await fs.pathExists(path.dirname(appPath))) {
+            return appPath
+        }
 
         // Check if src directory exists and prefer it
         if (await fs.pathExists(path.dirname(srcPath))) {

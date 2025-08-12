@@ -14,12 +14,18 @@ vi.mock("cosmiconfig", () => ({
 
 // Mock fs-extra
 vi.mock("fs-extra", () => ({
+    default: {
+        pathExists: vi.fn(),
+        writeFile: vi.fn(),
+        readJson: vi.fn(),
+    },
     pathExists: vi.fn(),
     writeFile: vi.fn(),
+    readJson: vi.fn(),
 }))
 
 import { cosmiconfig } from "cosmiconfig"
-import * as fs from "fs-extra"
+import fs from "fs-extra"
 
 const mockCosmiconfig = vi.mocked(cosmiconfig)
 const mockPathExists = vi.mocked(fs.pathExists)
@@ -49,6 +55,7 @@ describe("get-config", () => {
                 scss: {
                     variables: "@/styles/_variables.scss",
                     mixins: "@/styles/_mixins.scss",
+                    main: "@/styles/main.scss",
                 },
                 aliases: {
                     components: "@/components",
@@ -127,6 +134,7 @@ describe("get-config", () => {
                 scss: {
                     variables: "@/assets/styles/_variables.scss",
                     mixins: "@/assets/styles/_mixins.scss",
+                    main: "@/assets/styles/main.scss",
                 },
                 aliases: {
                     components: "@/components",
@@ -145,6 +153,7 @@ describe("get-config", () => {
                 cwd: "/test/project",
                 scssVariables: "/test/project/@/assets/styles/_variables.scss",
                 scssMixins: "/test/project/@/assets/styles/_mixins.scss",
+                scssMain: "/test/project/@/assets/styles/main.scss",
                 components: "/test/project/components",
                 ui: "/test/project/components/ui",
                 lib: "/test/project/lib",
@@ -161,6 +170,7 @@ describe("get-config", () => {
                 scss: {
                     variables: "@/assets/styles/_variables.scss",
                     mixins: "@/assets/styles/_mixins.scss",
+                    main: "@/assets/styles/main.scss",
                 },
                 aliases: {
                     components: "@/components",
@@ -190,6 +200,7 @@ describe("get-config", () => {
                 scss: {
                     variables: "@/assets/styles/_variables.scss",
                     mixins: "@/assets/styles/_mixins.scss",
+                    main: "@/assets/styles/main.scss",
                 },
                 aliases: {
                     components: "@/components",
@@ -229,6 +240,7 @@ describe("get-config", () => {
                 scss: {
                     variables: "@/assets/styles/_variables.scss",
                     mixins: "@/assets/styles/_mixins.scss",
+                    main: "@/assets/styles/main.scss",
                 },
                 aliases: {
                     components: "@/components",
@@ -261,6 +273,7 @@ describe("get-config", () => {
                 scss: {
                     variables: "@/assets/styles/_variables.scss",
                     mixins: "@/assets/styles/_mixins.scss",
+                    main: "@/assets/styles/main.scss",
                 },
                 aliases: {
                     components: "@/components",

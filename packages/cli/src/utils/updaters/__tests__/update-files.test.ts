@@ -18,7 +18,7 @@ describe("updateFiles", () => {
     let mockConfig: Config
 
     beforeEach(async () => {
-        testDir = join(tmpdir(), `meduza-ui-test-${Date.now()}`)
+        testDir = join(tmpdir(), `meduza-ui-test-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`)
         await fs.ensureDir(testDir)
 
         mockConfig = {
@@ -27,12 +27,16 @@ describe("updateFiles", () => {
             scss: {
                 variables: "@/assets/styles/_variables.scss",
                 mixins: "@/assets/styles/_mixins.scss",
+                main: "@/assets/styles/main.scss",
             },
             aliases: {
                 components: "@/components",
                 ui: "@/components/ui",
                 lib: "@/lib",
                 utils: "@/lib/utils",
+            },
+            framework: {
+                type: "vue",
             },
             registries: {
                 "meduza-ui": "https://meduza-ui.com/r",
@@ -41,6 +45,7 @@ describe("updateFiles", () => {
                 cwd: testDir,
                 scssVariables: join(testDir, "assets/styles/_variables.scss"),
                 scssMixins: join(testDir, "assets/styles/_mixins.scss"),
+                scssMain: join(testDir, "assets/styles/main.scss"),
                 components: join(testDir, "components"),
                 ui: join(testDir, "components/ui"),
                 lib: join(testDir, "lib"),
@@ -98,13 +103,13 @@ describe("updateFiles", () => {
             {
                 path: "assets/styles/_variables.scss",
                 content: ":root { --primary: blue; }",
-                type: "registry:style",
+                type: "file",
                 target: "assets/styles/_variables.scss",
             },
             {
                 path: "assets/styles/_mixins.scss",
                 content: "@mixin focus-ring { outline: 2px solid blue; }",
-                type: "registry:style",
+                type: "file",
                 target: "assets/styles/_mixins.scss",
             },
         ]

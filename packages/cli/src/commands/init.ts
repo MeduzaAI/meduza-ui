@@ -171,24 +171,24 @@ async function promptForConfig(
             type: "text",
             name: "scssVariables",
             message: "Where would you like to store your SCSS variables?",
-            initial: projectInfo.isSrcDir
-                ? "src/assets/styles/_variables.scss"
+            initial: projectInfo.baseDir
+                ? `${projectInfo.baseDir}/assets/styles/_variables.scss`
                 : "assets/styles/_variables.scss",
         },
         {
             type: "text",
             name: "scssMixins",
             message: "Where would you like to store your SCSS mixins?",
-            initial: projectInfo.isSrcDir
-                ? "src/assets/styles/_mixins.scss"
+            initial: projectInfo.baseDir
+                ? `${projectInfo.baseDir}/assets/styles/_mixins.scss`
                 : "assets/styles/_mixins.scss",
         },
         {
             type: "text",
             name: "scssMain",
             message: "Where would you like to store your SCSS main file?",
-            initial: projectInfo.isSrcDir
-                ? "src/assets/styles/main.scss"
+            initial: projectInfo.baseDir
+                ? `${projectInfo.baseDir}/assets/styles/main.scss`
                 : "assets/styles/main.scss",
         },
         {
@@ -236,7 +236,7 @@ function getDefaultConfig(
     projectInfo: ProjectInfo,
     options: z.infer<typeof initOptionsSchema>
 ): RawConfig {
-    const baseDir = projectInfo.isSrcDir ? "src" : ""
+    const baseDir = projectInfo.baseDir
     const aliasPrefix = projectInfo.aliasPrefix
 
     return {
@@ -244,9 +244,9 @@ function getDefaultConfig(
         style: options.style,
         baseColor: options.baseColor || "slate",
         scss: {
-            variables: path.join(baseDir, "assets/styles/_variables.scss"),
-            mixins: path.join(baseDir, "assets/styles/_mixins.scss"),
-            main: path.join(baseDir, "assets/styles/main.scss"),
+            variables: baseDir ? path.join(baseDir, "assets/styles/_variables.scss") : "assets/styles/_variables.scss",
+            mixins: baseDir ? path.join(baseDir, "assets/styles/_mixins.scss") : "assets/styles/_mixins.scss",
+            main: baseDir ? path.join(baseDir, "assets/styles/main.scss") : "assets/styles/main.scss",
         },
         aliases: {
             components: `${aliasPrefix}/components`,
@@ -327,7 +327,13 @@ async function addMainScssImport(
     }
 
     try {
-        // Find the main entry file (main.js, main.ts, etc.)
+        // Handle Nuxt projects differently - they use nuxt.config.ts for CSS imports
+        if (projectInfo.framework === "nuxt") {
+            await addNuxtScssImport(config, options)
+            return
+        }
+
+        // Find the main entry file (main.js, main.ts, etc.) for Vue projects
         const possibleMainFiles = [
             "src/main.js",
             "src/main.ts",
@@ -390,5 +396,73 @@ async function addMainScssImport(
             logger.stopSpinner(false, "Failed to add main.scss import")
         }
         throw error
+    }
+}
+
+async function addNuxtScssImport(
+    config: Config,
+    options: z.infer<typeof initOptionsSchema>
+) {
+    const nuxtConfigFiles = ["nuxt.config.ts", "nuxt.config.js"]
+    let configPath: string | null = null
+
+    // Find the Nuxt config file
+    for (const file of nuxtConfigFiles) {
+        if (await fs.pathExists(file)) {
+            configPath = file
+            break
+        }
+    }
+
+    if (!configPath) {
+        if (!options.silent) {
+            logger.warn("Could not find nuxt.config.ts to add SCSS import")
+        }
+        return
+    }
+
+    // Read the current config
+    const content = await fs.readFile(configPath, "utf8")
+
+    // Get the relative path to main.scss from the config file
+    const mainScssPath = config.resolvedPaths.scssMain
+    const relativePath = path.relative(process.cwd(), mainScssPath)
+
+    // Check if CSS import already exists
+    if (content.includes(relativePath) || content.includes('main.scss')) {
+        if (!options.silent) {
+            logger.stopSpinner(true, "Main SCSS import already exists in nuxt.config")
+        }
+        return
+    }
+
+    // Add the CSS import to nuxt.config
+    let updatedContent = content
+
+    // Look for existing css array
+    if (content.includes('css:')) {
+        // Add to existing css array
+        const cssRegex = /css:\s*\[([\s\S]*?)\]/
+        const match = content.match(cssRegex)
+        if (match) {
+            const existingCss = match[1].trim()
+            const newCssArray = existingCss
+                ? `${existingCss},\n    '${relativePath}'`
+                : `'${relativePath}'`
+            updatedContent = content.replace(cssRegex, `css: [\n    ${newCssArray}\n  ]`)
+        }
+    } else {
+        // Add new css property to the config
+        const configRegex = /(export\s+default\s+defineNuxtConfig\s*\(\s*\{)/
+        if (configRegex.test(content)) {
+            updatedContent = content.replace(configRegex, `$1\n  css: ['${relativePath}'],`)
+        }
+    }
+
+    // Write back to file
+    await fs.writeFile(configPath, updatedContent)
+
+    if (!options.silent) {
+        logger.stopSpinner(true, `Added main.scss import to ${configPath}`)
     }
 }
