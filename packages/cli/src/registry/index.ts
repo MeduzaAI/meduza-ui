@@ -5,7 +5,9 @@ export {
     registryFileSchema,
     registryConfigSchema,
     registryItemCssVarsSchema,
+    registryBaseColorSchema,
     type Registry,
     type RegistryItem,
     type RegistryFile,
+    type RegistryBaseColor,
 } from "./schema"

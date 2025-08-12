@@ -21,7 +21,7 @@ export const themes: RegistryItem[] = [
       {
         path: "assets/styles/_main.scss",
         type: "file",
-        target: "assets/styles/_main.scss"
+        target: "assets/styles/main.scss"
       }
     ],
     cssVars: {

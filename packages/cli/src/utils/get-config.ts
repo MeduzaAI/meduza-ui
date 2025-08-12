@@ -1,5 +1,5 @@
 import { cosmiconfig } from "cosmiconfig"
-import * as fs from "fs-extra"
+import fs from "fs-extra"
 import * as path from "path"
 import { z } from "zod"
 import { configSchema, rawConfigSchema, DEFAULT_CONFIG, type Config, type RawConfig } from "../registry/schema"
@@ -61,6 +61,7 @@ export async function resolveConfigPaths(
             cwd,
             scssVariables: path.resolve(cwd, mergedConfig.scss.variables),
             scssMixins: path.resolve(cwd, mergedConfig.scss.mixins),
+            scssMain: path.resolve(cwd, mergedConfig.scss.main),
             components: await resolveAlias(cwd, mergedConfig.aliases.components),
             ui: await resolveAlias(cwd, mergedConfig.aliases.ui),
             lib: await resolveAlias(cwd, mergedConfig.aliases.lib),

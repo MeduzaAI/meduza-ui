@@ -25,6 +25,9 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
+# Test projects (for local testing only)
+apps/test-*
+
 # OS generated files
 .DS_Store
 .DS_Store?

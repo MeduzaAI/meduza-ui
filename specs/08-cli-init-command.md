@@ -133,6 +133,9 @@ export async function runInit(options: z.infer<typeof initOptionsSchema>) {
   // Install base components
   const resolvedConfig = await resolveConfigPaths(options.cwd, config)
   await installBaseComponents(resolvedConfig, options)
+  
+  // Inject selected color variables
+  await injectColorVariables(config.baseColor, resolvedConfig, options)
 
   if (!options.silent) {
     logger.success("Project initialized successfully!")
@@ -150,15 +153,13 @@ export async function runInit(options: z.infer<typeof initOptionsSchema>) {
 
 ### 2. Configuration Prompting (`packages/cli/src/commands/init.ts` continued)
 ```typescript
-import { availableColors, getRegistryColors } from "@/utils/registry-api"
+import { getAvailableColors, fetchColorData } from "@/registry/api"
 
 async function promptForConfig(
   projectInfo: ProjectInfo,
   options: z.infer<typeof initOptionsSchema>
 ): Promise<RawConfig> {
-  const [colors] = await Promise.all([
-    getRegistryColors(),
-  ])
+  const colors = getAvailableColors()
 
   const responses = await prompts([
     {
@@ -216,6 +217,7 @@ async function promptForConfig(
   return {
     $schema: "https://meduza-ui.com/schema.json",
     style: responses.style,
+    baseColor: responses.baseColor,
     scss: {
       variables: responses.scssVariables,
       mixins: responses.scssMixins,
@@ -242,6 +244,7 @@ function getDefaultConfig(
   return {
     $schema: "https://meduza-ui.com/schema.json",
     style: options.style,
+    baseColor: options.baseColor || "slate",
     scss: {
       variables: path.join(baseDir, "assets/styles/_variables.scss"),
       mixins: path.join(baseDir, "assets/styles/_mixins.scss"),
@@ -327,9 +330,7 @@ async function installBaseComponents(
   // Install base utilities and styles
   const baseComponents = [
     "utils",           // useClassName utility and cn helper
-    "variables",       // CSS custom properties
-    "mixins",          // SCSS mixins  
-    "index",          // Base style configuration
+    "index",          // Base style configuration with theme variables
   ]
 
   await addComponents(baseComponents, config, {
@@ -338,21 +339,45 @@ async function installBaseComponents(
     isInit: true,
   })
 }
+
+async function injectColorVariables(
+  baseColor: string,
+  config: Config,
+  options: z.infer<typeof initOptionsSchema>
+) {
+  if (!options.silent) {
+    const spinner = logger.spin(`Injecting ${baseColor} color variables...`)
+  }
+  
+  try {
+    // Fetch color data from registry
+    const registryUrl = config.registries["meduza-ui"]
+    const colorData = await fetchColorData(baseColor, registryUrl)
+    
+    // Create variables file with selected colors
+    await createVariablesFile(config.resolvedPaths.scssVariables, colorData)
+    
+    // Create mixins file
+    await createMixinsFile(config.resolvedPaths.scssMixins)
+    
+    if (!options.silent) {
+      logger.stopSpinner(true, `Injected ${baseColor} color variables.`)
+    }
+  } catch (error) {
+    if (!options.silent) {
+      logger.stopSpinner(false, `Failed to inject color variables.`)
+    }
+    throw error
+  }
+}
 ```
 
-### 4. Registry API Implementation (`packages/cli/src/utils/registry-api.ts`)
+### 4. Registry API Implementation (`packages/cli/src/registry/api.ts`)
 ```typescript
 import fetch from "node-fetch"
-import { z } from "zod"
-import { registryItemSchema, registryIndexSchema } from "./registry"
-
-const colorSchema = z.object({
-  name: z.string(),
-  label: z.string(),
-  colors: z.record(z.string(), z.string()),
-})
-
-const colorsSchema = z.array(colorSchema)
+import * as fs from "fs-extra"
+import * as path from "path"
+import { registryItemSchema, registryBaseColorSchema, type RegistryItem, type RegistryBaseColor } from "meduza-ui/registry"
 
 export async function fetchRegistryIndex(registryUrl: string) {
   const response = await fetch(`${registryUrl}/styles/index.json`)
@@ -362,7 +387,7 @@ export async function fetchRegistryIndex(registryUrl: string) {
   }
 
   const json = await response.json()
-  return registryIndexSchema.parse(json)
+  return json
 }
 
 export async function fetchRegistryItem(
@@ -379,29 +404,228 @@ export async function fetchRegistryItem(
   return registryItemSchema.parse(json)
 }
 
-export async function getRegistryColors() {
-  try {
-    const response = await fetch("https://meduza-ui.com/r/colors/index.json")
-    
-    if (!response.ok) {
-      return getDefaultColors()
-    }
+export async function fetchColorData(
+  baseColor: string,
+  registryUrl: string
+): Promise<RegistryBaseColor> {
+  const response = await fetch(`${registryUrl}/colors/${baseColor}.json`)
+  
+  if (!response.ok) {
+    throw new Error(`Failed to fetch color data for ${baseColor}: ${response.statusText}`)
+  }
 
-    const json = await response.json()
-    return colorsSchema.parse(json)
-  } catch {
-    return getDefaultColors()
+  const json = await response.json()
+  return registryBaseColorSchema.parse(json)
+}
+
+export function getAvailableColors() {
+  return [
+    { name: "slate", label: "Slate" },
+    { name: "zinc", label: "Zinc" },
+    { name: "stone", label: "Stone" },
+    { name: "gray", label: "Gray" },
+    { name: "neutral", label: "Neutral" },
+  ]
+}
+
+export async function createVariablesFile(
+  variablesPath: string,
+  colorData: RegistryBaseColor
+) {
+  // Create the directory if it doesn't exist
+  await fs.ensureDir(path.dirname(variablesPath))
+
+  // Generate variables file content with injected colors
+  const variablesContent = generateVariablesContent(colorData)
+  
+  // Write the variables file
+  await fs.writeFile(variablesPath, variablesContent, "utf8")
+}
+
+export async function createMixinsFile(mixinsPath: string) {
+  // Create the directory if it doesn't exist
+  await fs.ensureDir(path.dirname(mixinsPath))
+
+  const mixinsContent = `// SCSS Mixins for Meduza UI
+// Focus ring utility
+@mixin focus-ring {
+  &:focus-visible {
+    outline: 2px solid var(--ring-color);
+    outline-offset: 2px;
   }
 }
 
-function getDefaultColors() {
-  return [
-    { name: "slate", label: "Slate", colors: {} },
-    { name: "gray", label: "Gray", colors: {} },
-    { name: "zinc", label: "Zinc", colors: {} },
-    { name: "neutral", label: "Neutral", colors: {} },
-    { name: "stone", label: "Stone", colors: {} },
-  ]
+// Text utilities  
+@mixin text($size: 'base', $weight: 'regular') {
+  @if $size == 'xs' {
+    font-size: var(--text-xs);
+  } @else if $size == 'sm' {
+    font-size: var(--text-sm);
+  } @else if $size == 'base' {
+    font-size: var(--text-base);
+  } @else if $size == 'lg' {
+    font-size: var(--text-lg);
+  } @else if $size == 'xl' {
+    font-size: var(--text-xl);
+  }
+  
+  @if $weight == 'light' {
+    font-weight: var(--font-light);
+  } @else if $weight == 'regular' {
+    font-weight: var(--font-regular);
+  } @else if $weight == 'medium' {
+    font-weight: var(--font-medium);
+  } @else if $weight == 'semibold' {
+    font-weight: var(--font-semibold);
+  } @else if $weight == 'bold' {
+    font-weight: var(--font-bold);
+  }
+}
+
+// Container utilities
+@mixin container($size: 'default') {
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 var(--spacing-4);
+  
+  @if $size == 'sm' {
+    max-width: 640px;
+  } @else if $size == 'md' {
+    max-width: 768px;
+  } @else if $size == 'lg' {
+    max-width: 1024px;
+  } @else if $size == 'xl' {
+    max-width: 1280px;
+  }
+}
+`
+  
+  // Write the mixins file
+  await fs.writeFile(mixinsPath, mixinsContent, "utf8")
+}
+
+function generateVariablesContent(colorData: RegistryBaseColor): string {
+  // Base design system variables template
+  const baseVariables = `// Comprehensive design system variables
+// Colors will be injected based on selected base color
+
+:root {
+  /* Colors - Semantic (injected based on selected base color) */`
+
+  // Inject light mode color variables
+  const lightVars = Object.entries(colorData.cssVars.light)
+    .map(([key, value]) => `  --${key}: ${value};`)
+    .join('\n')
+
+  const middleSection = `
+  
+  /* Spacing - comprehensive scale in pixels */
+  --spacing-0: 0px;
+  --spacing-px: 1px;
+  --spacing-0-5: 2px;
+  --spacing-1: 4px;
+  --spacing-1-5: 6px;
+  --spacing-2: 8px;
+  --spacing-2-5: 10px;
+  --spacing-3: 12px;
+  --spacing-3-5: 14px;
+  --spacing-4: 16px;
+  --spacing-5: 20px;
+  --spacing-6: 24px;
+  --spacing-7: 28px;
+  --spacing-8: 32px;
+  --spacing-9: 36px;
+  --spacing-10: 40px;
+  --spacing-11: 44px;
+  --spacing-12: 48px;
+  --spacing-14: 56px;
+  --spacing-16: 64px;
+  --spacing-20: 80px;
+  --spacing-24: 96px;
+  --spacing-28: 112px;
+  --spacing-32: 128px;
+  
+  /* Typography - semantic naming */
+  --font-heading: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', monospace;
+  
+  /* Font sizes - pixels */
+  --text-xs: 12px;
+  --text-sm: 14px;
+  --text-base: 16px;
+  --text-lg: 18px;
+  --text-xl: 20px;
+  --text-2xl: 24px;
+  --text-3xl: 30px;
+  --text-4xl: 36px;
+  --text-5xl: 48px;
+  --text-6xl: 60px;
+  
+  /* Font weights */
+  --font-light: 300;
+  --font-regular: 400;
+  --font-medium: 500;
+  --font-semibold: 600;
+  --font-bold: 700;
+  
+  /* Line heights */
+  --leading-none: 1;
+  --leading-tight: 1.25;
+  --leading-snug: 1.375;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.625;
+  --leading-loose: 2;
+  
+  /* Border radius - pixels */
+  --radius-none: 0px;
+  --radius-sm: 2px;
+  --radius-base: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+  --radius-2xl: 16px;
+  --radius-3xl: 24px;
+  --radius-full: 9999px;
+  
+  /* Default radius for components */
+  --radius: 6px;
+  
+  /* Shadows - pixels */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-base: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  
+  /* Transitions */
+  --transition-fast: 0.15s ease;
+  --transition-base: 0.2s ease;
+  --transition-slow: 0.3s ease;
+  
+  /* Z-index scale */
+  --z-dropdown: 1000;
+  --z-sticky: 1020;
+  --z-fixed: 1030;
+  --z-modal-backdrop: 1040;
+  --z-modal: 1050;
+  --z-popover: 1060;
+  --z-tooltip: 1070;
+}
+
+[data-theme="dark"] {
+  /* Dark mode color overrides (injected based on selected base color) */`
+
+  // Inject dark mode color variables
+  const darkVars = Object.entries(colorData.cssVars.dark)
+    .map(([key, value]) => `  --${key}: ${value};`)
+    .join('\n')
+
+  const endSection = `
+}`
+
+  return baseVariables + '\n' + lightVars + middleSection + '\n' + darkVars + endSection
 }
 ```
 
@@ -454,17 +678,33 @@ function getTargetPath(file: RegistryItemFile, config: Config): string {
   const target = file.target || file.path
 
   // Handle different file types
+  if (file.type === "file") {
+    // Handle lib files
+    if (target.startsWith("lib/") || target.includes("utils.ts")) {
+      const filename = path.basename(target)
+      return path.resolve(config.resolvedPaths.lib, filename)
+    }
+    
+    // Handle UI component files  
+    if (target.startsWith("components/ui/") || target.startsWith("ui/")) {
+      const filename = path.basename(target)
+      return path.resolve(config.resolvedPaths.ui, filename)
+    }
+  }
+
   if (file.type === "registry:lib") {
     // Lib files go to the lib directory
-    if (target.startsWith("lib/")) {
-      return path.resolve(config.resolvedPaths.lib, target.slice(4))
+    if (target.startsWith("lib/") || target.includes("utils")) {
+      const filename = path.basename(target)
+      return path.resolve(config.resolvedPaths.lib, filename)
     }
   }
 
   if (file.type === "registry:ui") {
     // UI components go to the ui directory
-    if (target.startsWith("ui/")) {
-      return path.resolve(config.resolvedPaths.ui, target.slice(3))
+    if (target.startsWith("ui/") || target.startsWith("components/ui/")) {
+      const filename = path.basename(target)
+      return path.resolve(config.resolvedPaths.ui, filename)
     }
   }
 
@@ -630,64 +870,91 @@ main().catch((error) => {
 
 ## Expected Registry Items for Init
 
-Based on our previous specs, the `init` command will install these registry items:
+Based on our current registry structure, the `init` command will install these registry items:
 
 ### 1. Utils (`utils.json`)
 ```json
 {
+  "$schema": "https://meduza-ui.dev/schema/registry-item.json",
   "name": "utils",
   "type": "registry:lib",
+  "description": "BEM className utility for Vue components",
   "dependencies": [],
   "files": [
     {
       "path": "lib/utils.ts",
       "content": "// useClassName and cn utilities",
-      "type": "registry:lib"
+      "type": "file",
+      "target": "lib/utils.ts"
     }
   ]
 }
 ```
 
-### 2. Variables (`variables.json`)
+### 2. Index (`index.json`)
 ```json
 {
-  "name": "variables",
+  "$schema": "https://meduza-ui.dev/schema/registry-item.json",
+  "name": "index",
   "type": "registry:style",
+  "description": "Base style system with SCSS variables and mixins",
   "dependencies": [],
+  "registryDependencies": ["utils"],
   "files": [
     {
       "path": "assets/styles/_variables.scss",
-      "content": "// CSS custom properties",
-      "type": "registry:style"
-    }
-  ]
-}
-```
-
-### 3. Mixins (`mixins.json`)
-```json
-{
-  "name": "mixins", 
-  "type": "registry:style",
-  "dependencies": [],
-  "files": [
+      "content": "// Base variables (injected during init)",
+      "type": "file",
+      "target": "assets/styles/_variables.scss"
+    },
     {
-      "path": "assets/styles/_mixins.scss",
+      "path": "assets/styles/_mixins.scss", 
       "content": "// SCSS mixins",
-      "type": "registry:style"
+      "type": "file",
+      "target": "assets/styles/_mixins.scss"
+    },
+    {
+      "path": "assets/styles/_main.scss",
+      "content": "// Main styles",
+      "type": "file", 
+      "target": "assets/styles/_main.scss"
     }
-  ]
+  ],
+  "cssVars": {
+    "light": {
+      "primary-color": "#334155",
+      "primary-foreground-color": "#f8fafc"
+    },
+    "dark": {
+      "primary-color": "#e2e8f0",
+      "primary-foreground-color": "#0f172a"
+    }
+  }
 }
 ```
 
-### 4. Index (`index.json`)
+### 3. Color Registry Endpoints
+
+The init command will also fetch from these color endpoints to inject variables:
+
+- `/r/colors/slate.json` - Slate color mappings
+- `/r/colors/zinc.json` - Zinc color mappings  
+- `/r/colors/stone.json` - Stone color mappings
+- `/r/colors/gray.json` - Gray color mappings
+- `/r/colors/neutral.json` - Neutral color mappings
+
+Each color endpoint returns:
 ```json
 {
-  "name": "index",
-  "type": "registry:style", 
-  "dependencies": ["sass"],
-  "registryDependencies": ["utils"],
-  "files": []
+  "inlineColors": {
+    "light": { "primary": "slate-900", "background": "white" },
+    "dark": { "primary": "slate-50", "background": "slate-950" }
+  },
+  "cssVars": {
+    "light": { "primary-color": "#0f172a", "background-color": "#ffffff" },
+    "dark": { "primary-color": "#f8fafc", "background-color": "#0f172a" }
+  },
+  "cssVarsTemplate": ":root {\n  --primary-color: #0f172a;\n}"
 }
 ```
 
@@ -763,14 +1030,21 @@ describe("init command", () => {
 ## CLI Usage Examples
 
 ```bash
-# Initialize with defaults
+# Initialize with defaults (slate color)
 npx meduza-ui init --defaults
 
-# Initialize with prompts
+# Initialize with interactive prompts (includes color selection)
 npx meduza-ui init
 
-# Initialize with specific options
-npx meduza-ui init --style default --base-color slate --src-dir
+# Initialize with specific base color
+npx meduza-ui init --style default --base-color zinc --src-dir
+
+# Initialize with different colors
+npx meduza-ui init --base-color slate    # Cooler, professional
+npx meduza-ui init --base-color zinc     # Modern, neutral
+npx meduza-ui init --base-color stone    # Warm, natural  
+npx meduza-ui init --base-color gray     # Classic, versatile
+npx meduza-ui init --base-color neutral  # Clean, minimal
 
 # Force overwrite existing config
 npx meduza-ui init --force
@@ -778,35 +1052,59 @@ npx meduza-ui init --force
 # Initialize in specific directory
 npx meduza-ui init --cwd ./my-vue-project
 
-# Silent initialization
-npx meduza-ui init --defaults --silent
+# Silent initialization with color
+npx meduza-ui init --defaults --base-color zinc --silent
 ```
 
 ## Deliverables
 
 1. **Complete init command** with interactive prompts and validation
 2. **Project detection** for Vue.js frameworks (Vue CLI, Vite, Nuxt)
-3. **Configuration management** with `meduza.config.json` generation
-4. **Base component installation** (utils, variables, mixins, index)
-5. **Registry API integration** for fetching components
-6. **File management** with proper path resolution and overwrite protection
-7. **Dependency installation** with package manager detection
-8. **Error handling** and user-friendly messages
-9. **Testing suite** with comprehensive test coverage
-10. **CLI integration** with proper help and version commands
+3. **Configuration management** with `meduza.config.json` generation including `baseColor`
+4. **Base color selection** with 5 options (slate, zinc, stone, gray, neutral)
+5. **Color system integration** that fetches and injects CSS variables
+6. **Base component installation** (utils, index with comprehensive theme system)
+7. **Variables and mixins generation** with selected color injection
+8. **Registry API integration** for fetching components and color data
+9. **File management** with proper path resolution and overwrite protection
+10. **Dependency installation** with package manager detection
+11. **Error handling** and user-friendly messages
+12. **Testing suite** with comprehensive test coverage including color system
+13. **CLI integration** with proper help and version commands
 
 ## Testing Checklist
 
+### Core Functionality
 - [ ] Init command detects Vue.js projects correctly
-- [ ] Configuration prompts work with all options
-- [ ] Default configuration generates correctly
+- [ ] Configuration prompts work with all color options (slate, zinc, stone, gray, neutral)
+- [ ] Default configuration generates correctly with default slate color
 - [ ] Registry API fetches base components successfully
 - [ ] Files are created in correct locations based on aliases
 - [ ] Dependencies are installed with correct package manager
 - [ ] Existing configuration is protected unless --force is used
+
+### Color System Integration  
+- [ ] Base color selection prompts display all 5 colors
+- [ ] Color data fetching works for all base colors from `/r/colors/{color}.json`
+- [ ] Variables file injection includes selected color CSS variables
+- [ ] Generated variables file preserves design system tokens (spacing, typography, etc.)
+- [ ] Mixins file is created with proper SCSS utilities
+- [ ] Dark mode color variables are injected correctly
+
+### Error Handling & Edge Cases
 - [ ] Error handling works for network failures and invalid projects
+- [ ] Color fetching handles network failures gracefully
+- [ ] Invalid color selections are handled properly
+- [ ] File system errors during injection are caught
 - [ ] Silent mode suppresses output correctly
 - [ ] CLI help and version commands work
+
+### File System & Paths
+- [ ] Utils file is placed in correct lib directory
+- [ ] Component files use correct target paths (components/ui/ vs ui/)
+- [ ] Variables and mixins files respect user-defined paths
+- [ ] Directory creation works for nested paths
+- [ ] File overwrite protection works correctly
 
 ## Next Steps
 

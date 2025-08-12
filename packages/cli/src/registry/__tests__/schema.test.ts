@@ -56,11 +56,11 @@ describe("schema", () => {
             expect(result.success).toBe(true)
         })
 
-        it("should require {name} placeholder in URL", () => {
+        it("should accept valid URLs without placeholder", () => {
             const result = registryConfigItemSchema.safeParse(
-                "https://example.com/r/components.json"
+                "https://example.com/r"
             )
-            expect(result.success).toBe(false)
+            expect(result.success).toBe(true)
         })
     })
 
