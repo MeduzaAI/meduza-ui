@@ -1,4 +1,4 @@
-# 06 - CLI Package Setup
+# 04 - CLI Package Setup
 
 ## Overview
 Create the foundational CLI package structure for Meduza UI, establishing the core architecture, dependencies, and utilities needed for the `init` and `add` commands. This follows the established patterns from shadcn/ui but adapted for Vue.js and SCSS.
@@ -183,26 +183,68 @@ main().catch((error) => {
 })
 ```
 
-### 5. Configuration Schema (`packages/cli/src/utils/config-schema.ts`)
+### 5. Configuration Schema (`packages/cli/src/registry/schema.ts`)
 ```typescript
 import { z } from "zod"
 
+// Registry configuration item schema
+export const registryConfigItemSchema = z.union([
+  // Simple string format: "https://example.com/r/{name}.json"
+  z.string().refine((s) => s.includes("{name}"), {
+    message: "Registry URL must include {name} placeholder",
+  }),
+  // Object format with name and url only
+  z.object({
+    name: z.string(),
+    url: z.string().refine((s) => s.includes("{name}"), {
+      message: "Registry URL must include {name} placeholder",
+    }),
+  }),
+])
+
+// Registry configuration schema
+export const registryConfigSchema = z.record(
+  z.string().refine((key) => {
+    // Allow both @ prefixed (external) and simple names (official)
+    return key.startsWith("@") || /^[a-z][a-z0-9-]*$/.test(key)
+  }, {
+    message: "Registry names must start with @ (external) or be kebab-case (official)",
+  }),
+  registryConfigItemSchema
+)
+
+// Raw config schema (what users write)
 export const rawConfigSchema = z.object({
   $schema: z.string().optional(),
   style: z.string().default("default"),
+  
+  // SCSS configuration (Vue-specific)
   scss: z.object({
     variables: z.string(),
     mixins: z.string(),
+    // Optional global imports
+    imports: z.array(z.string()).optional(),
   }),
+
+  // Path aliases
   aliases: z.object({
     components: z.string(),
     ui: z.string(),
     lib: z.string(),
     utils: z.string(),
+    // Vue-specific additions
+    composables: z.string().optional(),
+    assets: z.string().optional(),
+    styles: z.string().optional(),
   }),
-  registries: z.record(z.string(), z.string()).optional(),
+  
+  framework: z.object({
+    type: z.enum(["vue", "nuxt"]).default("vue"),
+    version: z.string().optional(),
+  }).optional(),
 })
 
+// Config schema with resolved paths (internal use)
 export const configSchema = rawConfigSchema.extend({
   resolvedPaths: z.object({
     cwd: z.string(),
@@ -212,6 +254,9 @@ export const configSchema = rawConfigSchema.extend({
     ui: z.string(),
     lib: z.string(),
     utils: z.string(),
+    composables: z.string(),
+    assets: z.string(),
+    styles: z.string(),
   }),
 })
 
@@ -220,20 +265,23 @@ export type RawConfig = z.infer<typeof rawConfigSchema>
 
 // Default configuration for Vue projects
 export const DEFAULT_REGISTRIES = {
-  "meduza-ui": "https://meduza-ui.com/r",
+  "meduza-ui": "https://meduza-ui.com/r/{name}.json",
 }
 
 export const DEFAULT_CONFIG: RawConfig = {
   style: "default",
   scss: {
-    variables: "src/assets/styles/_variables.scss",
-    mixins: "src/assets/styles/_mixins.scss",
+    variables: "@/assets/styles/_variables.scss",
+    mixins: "@/assets/styles/_mixins.scss",
   },
   aliases: {
     components: "@/components",
     ui: "@/components/ui",
     lib: "@/lib",
     utils: "@/lib/utils",
+    composables: "@/composables",
+    assets: "@/assets",
+    styles: "@/assets/styles"
   },
   registries: DEFAULT_REGISTRIES,
 }
@@ -439,6 +487,9 @@ export async function resolveConfigPaths(
       ui: await resolveAlias(cwd, mergedConfig.aliases.ui),
       lib: await resolveAlias(cwd, mergedConfig.aliases.lib),
       utils: await resolveAlias(cwd, mergedConfig.aliases.utils),
+      composables: await resolveAlias(cwd, mergedConfig.aliases.composables),
+      assets: await resolveAlias(cwd, mergedConfig.aliases.assets),
+      styles: await resolveAlias(cwd, mergedConfig.aliases.styles)
     },
   })
 }
@@ -467,58 +518,8 @@ export async function writeConfig(cwd: string, config: RawConfig): Promise<void>
 }
 ```
 
-### 8. Registry API Types (`packages/cli/src/utils/registry.ts`)
-```typescript
-import { z } from "zod"
 
-export const registryItemFileSchema = z.object({
-  path: z.string(),
-  content: z.string(),
-  type: z.enum(["registry:lib", "registry:ui", "registry:style", "registry:theme"]),
-  target: z.string().optional(),
-})
-
-export const registryItemSchema = z.object({
-  name: z.string(),
-  type: z.enum(["registry:lib", "registry:ui", "registry:style", "registry:theme"]),
-  description: z.string().optional(),
-  dependencies: z.array(z.string()).optional(),
-  registryDependencies: z.array(z.string()).optional(),
-  files: z.array(registryItemFileSchema),
-  cssVars: z.record(z.string(), z.string()).optional(),
-  scssVars: z.record(z.string(), z.string()).optional(),
-})
-
-export const registryIndexSchema = z.array(
-  z.object({
-    name: z.string(),
-    type: z.enum(["registry:lib", "registry:ui", "registry:style", "registry:theme"]),
-    description: z.string().optional(),
-  })
-)
-
-export type RegistryItem = z.infer<typeof registryItemSchema>
-export type RegistryItemFile = z.infer<typeof registryItemFileSchema>
-export type RegistryIndex = z.infer<typeof registryIndexSchema>
-
-// Registry API functions (to be implemented in add command spec)
-export async function fetchRegistryIndex(
-  registryUrl: string
-): Promise<RegistryIndex> {
-  // Implementation will be added in the add command spec
-  throw new Error("Not implemented yet")
-}
-
-export async function fetchRegistryItem(
-  registryUrl: string,
-  name: string
-): Promise<RegistryItem> {
-  // Implementation will be added in the add command spec  
-  throw new Error("Not implemented yet")
-}
-```
-
-### 9. Logging and Output Utilities (`packages/cli/src/utils/logger.ts`)
+### 8. Logging and Output Utilities (`packages/cli/src/utils/logger.ts`)
 ```typescript
 import kleur from "kleur"
 import ora, { type Ora } from "ora"
@@ -565,7 +566,7 @@ export class Logger {
 export const logger = new Logger()
 ```
 
-### 10. Error Handling (`packages/cli/src/utils/handle-error.ts`)
+### 9. Error Handling (`packages/cli/src/utils/handle-error.ts`)
 ```typescript
 import kleur from "kleur"
 import { logger } from "./logger"
@@ -592,7 +593,7 @@ export function handleError(error: unknown): never {
 }
 ```
 
-### 11. Package Manager Detection (`packages/cli/src/utils/get-package-manager.ts`)
+### 10. Package Manager Detection (`packages/cli/src/utils/get-package-manager.ts`)
 ```typescript
 import { detect } from "@antfu/ni"
 
@@ -647,7 +648,7 @@ export async function getPackageRunner(cwd: string): Promise<string> {
 
 ## Testing Setup
 
-### 12. Basic Test Setup (`packages/cli/vitest.config.ts`)
+### 11. Basic Test Setup (`packages/cli/vitest.config.ts`)
 ```typescript
 import { defineConfig } from "vitest/config"
 import path from "path"
@@ -665,12 +666,18 @@ export default defineConfig({
 })
 ```
 
-### 13. Example Test (`packages/cli/src/utils/__tests__/config-schema.test.ts`)
+### 12. Example Test (`packages/cli/src/registry/__tests__/schema.test.ts`)
 ```typescript
 import { describe, it, expect } from "vitest"
-import { rawConfigSchema, configSchema, DEFAULT_CONFIG } from "../config-schema"
+import { 
+  rawConfigSchema, 
+  configSchema, 
+  registryConfigItemSchema,
+  registryConfigSchema,
+  DEFAULT_CONFIG 
+} from "../schema"
 
-describe("config-schema", () => {
+describe("schema", () => {
   it("should validate default config", () => {
     const result = rawConfigSchema.safeParse(DEFAULT_CONFIG)
     expect(result.success).toBe(true)
@@ -693,6 +700,56 @@ describe("config-schema", () => {
 
     const result = rawConfigSchema.safeParse(customConfig)
     expect(result.success).toBe(true)
+  })
+
+  describe("registryConfigItemSchema", () => {
+    it("should validate simple string format", () => {
+      const result = registryConfigItemSchema.safeParse(
+        "https://example.com/r/{name}.json"
+      )
+      expect(result.success).toBe(true)
+    })
+
+    it("should validate object format with name and url", () => {
+      const result = registryConfigItemSchema.safeParse({
+        name: "My Registry",
+        url: "https://example.com/r/{name}.json"
+      })
+      expect(result.success).toBe(true)
+    })
+
+    it("should require {name} placeholder in URL", () => {
+      const result = registryConfigItemSchema.safeParse(
+        "https://example.com/r/components.json"
+      )
+      expect(result.success).toBe(false)
+    })
+  })
+
+  describe("registryConfigSchema", () => {
+    it("should validate official registry names", () => {
+      const result = registryConfigSchema.safeParse({
+        "meduza-ui": "https://meduza-ui.com/r/{name}.json"
+      })
+      expect(result.success).toBe(true)
+    })
+
+    it("should validate external registry names with @", () => {
+      const result = registryConfigSchema.safeParse({
+        "@company/ui": {
+          name: "Company UI",
+          url: "https://company.com/r/{name}.json"
+        }
+      })
+      expect(result.success).toBe(true)
+    })
+
+    it("should reject invalid registry names", () => {
+      const result = registryConfigSchema.safeParse({
+        "Invalid_Registry": "https://example.com/r/{name}.json"
+      })
+      expect(result.success).toBe(false)
+    })
   })
 })
 ```

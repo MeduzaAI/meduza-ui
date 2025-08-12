@@ -15,20 +15,33 @@ Set up the foundational monorepo structure and create the registry application (
 meduza-ui/
 ├── apps/
 │   └── v1/                # Registry & Documentation app
-│       ├── components/
-│       │   └── ui/        # Component source files
+│       ├── app/           # Nuxt 4 app directory
+│       │   ├── app.vue    # Main app component
+│       │   ├── index.vue  # Root page
+│       │   ├── assets/
+│       │   │   └── styles/ # SCSS files
+│       │   ├── components/
+│       │   │   └── ui/     # Component source files
+│       │   ├── layouts/
+│       │   │   └── default.vue
+│       │   └── lib/       # Utility functions
+│       ├── registry/      # Registry components and config
+│       │   ├── default/   # Default theme components
+│       │   │   ├── ui/    # UI components
+│       │   │   └── lib/   # Library functions
+│       │   ├── config/    # Configuration files
+│       │   ├── styles/    # Registry-specific styles
+│       │   └── registry-*.ts # Registry modules
 │       ├── content/
 │       │   └── docs/      # Documentation content
 │       ├── public/
 │       │   └── r/         # Generated registry JSON files
 │       ├── scripts/
 │       │   └── build-registry.ts  # Registry build script
-│       ├── pages/         # Documentation pages
-│       ├── assets/
-│       │   └── styles/    # SCSS files
-│       ├── lib/           # Utility functions
+│       ├── lib/           # Library files
 │       ├── package.json
 │       ├── nuxt.config.ts
+│       ├── tsconfig.json
 │       └── README.md
 ├── packages/              # Future CLI package location
 ├── package.json           # Root package.json
@@ -39,10 +52,10 @@ meduza-ui/
 ```
 
 ## Technology Stack
-- **Framework**: Nuxt 3 (for SSG/SSR capabilities and easy API routes)
+- **Framework**: Nuxt 4 (for SSG/SSR capabilities and easy API routes)
 - **Styling**: SCSS + CSS custom properties
 - **TypeScript**: Full TypeScript support
-- **Build Tool**: Vite (included with Nuxt 3)
+- **Build Tool**: Vite (included with Nuxt 4)
 
 ## Monorepo Setup
 
@@ -205,7 +218,7 @@ pnpm dev
 ## Deliverables
 
 1. **Monorepo structure** with pnpm workspaces
-2. **Working Nuxt 3 application** with basic structure
+2. **Working Nuxt 4 application** with basic structure
 3. **Development environment** with hot reload
 4. **SCSS setup** with proper configuration
 5. **Basic documentation structure** ready for content
