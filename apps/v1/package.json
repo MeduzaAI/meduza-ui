@@ -25,6 +25,8 @@
     "@nuxt/devtools": "latest",
     "@types/node": "^24.2.1",
     "glob": "^10.3.10",
+    "meduza-ui": "workspace:^",
+    "rimraf": "^5.0.5",
     "tsx": "^4.19.2",
     "typescript": "^5.4.5"
   }

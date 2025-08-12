@@ -1,0 +1,80 @@
+{
+  "name": "meduza-ui",
+  "items": [
+    {
+      "name": "button",
+      "type": "registry:ui",
+      "description": "A flexible button component with multiple variants and sizes",
+      "dependencies": [],
+      "registryDependencies": [
+        "utils"
+      ],
+      "files": [
+        {
+          "path": "registry/default/ui/button.vue",
+          "type": "file",
+          "target": "components/ui/button.vue"
+        }
+      ]
+    },
+    {
+      "name": "utils",
+      "type": "registry:lib",
+      "description": "BEM className utility for Vue components",
+      "dependencies": [],
+      "files": [
+        {
+          "path": "registry/default//lib/utils.ts",
+          "type": "file",
+          "target": "lib/utils.ts"
+        }
+      ]
+    },
+    {
+      "name": "index",
+      "type": "registry:style",
+      "description": "Base style system with SCSS variables and mixins",
+      "dependencies": [],
+      "registryDependencies": [
+        "utils"
+      ],
+      "files": [
+        {
+          "path": "registry/default/assets/styles/_variables.scss",
+          "type": "file",
+          "target": "assets/styles/_variables.scss"
+        },
+        {
+          "path": "registry/default/assets/styles/_mixins.scss",
+          "type": "file",
+          "target": "assets/styles/_mixins.scss"
+        },
+        {
+          "path": "registry/default/assets/styles/_main.scss",
+          "type": "file",
+          "target": "assets/styles/_main.scss"
+        }
+      ],
+      "cssVars": {
+        "light": {
+          "primary-color": "#334155",
+          "primary-foreground-color": "#f8fafc",
+          "secondary-color": "#f1f5f9",
+          "secondary-foreground-color": "#0f172a",
+          "background-color": "#ffffff",
+          "foreground-color": "#0f172a",
+          "border-color": "#e2e8f0"
+        },
+        "dark": {
+          "primary-color": "#e2e8f0",
+          "primary-foreground-color": "#0f172a",
+          "secondary-color": "#1e293b",
+          "secondary-foreground-color": "#f8fafc",
+          "background-color": "#0f172a",
+          "foreground-color": "#f8fafc",
+          "border-color": "#334155"
+        }
+      }
+    }
+  ]
+}

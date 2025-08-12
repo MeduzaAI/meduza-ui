@@ -1,10 +1,10 @@
-import { readFileSync, writeFileSync, mkdirSync } from 'fs';
-import { join } from 'path';
+import { writeFileSync, readFileSync, mkdirSync } from 'node:fs';
+import { join } from 'node:path';
 import { availableStyles } from '../registry/config/styles';
-import { availableColors, colorValues } from '../registry/config/colors';
+import { registry } from '../registry/index';
+import { buildColorsRegistry } from './build-colors';
 
 interface RegistryItem {
-    $schema?: string;
     name: string;
     type: string;
     description?: string;
@@ -14,10 +14,8 @@ interface RegistryItem {
         path: string;
         content: string;
         type: string;
-        target: string;
+        target?: string;
     }>;
-    cssVars?: Record<string, Record<string, string>>;
-    scssVars?: Record<string, string>;
 }
 
 async function buildRegistry() {
@@ -35,131 +33,75 @@ async function buildRegistry() {
         join(outputDir, 'styles/index.json'),
         JSON.stringify(availableStyles, null, 2)
     );
-    console.log('✓ Built styles index');
 
-    // 2. Build colors index
-    writeFileSync(
-        join(outputDir, 'colors/index.json'),
-        JSON.stringify(availableColors, null, 2)
-    );
-    console.log('✓ Built colors index');
+    // 2. Build colors registry (simple!)
+    await buildColorsRegistry();
 
-    // 3. Build individual color files
-    Object.entries(colorValues).forEach(([colorName, colors]) => {
-        const colorData = {
-            cssVars: {
-                light: {
-                    "primary": colors["700"].replace('#', '').match(/.{2}/g)?.map(x => parseInt(x, 16)).join(' ') + '%',
-                    "primary-foreground": colors["50"].replace('#', '').match(/.{2}/g)?.map(x => parseInt(x, 16)).join(' ') + '%',
-                    "secondary": colors["100"].replace('#', '').match(/.{2}/g)?.map(x => parseInt(x, 16)).join(' ') + '%',
-                    "secondary-foreground": colors["900"].replace('#', '').match(/.{2}/g)?.map(x => parseInt(x, 16)).join(' ') + '%',
-                    "muted": colors["100"].replace('#', '').match(/.{2}/g)?.map(x => parseInt(x, 16)).join(' ') + '%',
-                    "muted-foreground": colors["500"].replace('#', '').match(/.{2}/g)?.map(x => parseInt(x, 16)).join(' ') + '%',
-                    "border": colors["200"].replace('#', '').match(/.{2}/g)?.map(x => parseInt(x, 16)).join(' ') + '%',
-                    "input": colors["200"].replace('#', '').match(/.{2}/g)?.map(x => parseInt(x, 16)).join(' ') + '%'
-                },
-                dark: {
-                    "primary": colors["200"].replace('#', '').match(/.{2}/g)?.map(x => parseInt(x, 16)).join(' ') + '%',
-                    "primary-foreground": colors["900"].replace('#', '').match(/.{2}/g)?.map(x => parseInt(x, 16)).join(' ') + '%',
-                    "secondary": colors["800"].replace('#', '').match(/.{2}/g)?.map(x => parseInt(x, 16)).join(' ') + '%',
-                    "secondary-foreground": colors["200"].replace('#', '').match(/.{2}/g)?.map(x => parseInt(x, 16)).join(' ') + '%',
-                    "muted": colors["800"].replace('#', '').match(/.{2}/g)?.map(x => parseInt(x, 16)).join(' ') + '%',
-                    "muted-foreground": colors["400"].replace('#', '').match(/.{2}/g)?.map(x => parseInt(x, 16)).join(' ') + '%',
-                    "border": colors["700"].replace('#', '').match(/.{2}/g)?.map(x => parseInt(x, 16)).join(' ') + '%',
-                    "input": colors["700"].replace('#', '').match(/.{2}/g)?.map(x => parseInt(x, 16)).join(' ') + '%'
-                }
-            },
-            scssVars: Object.fromEntries(
-                Object.entries(colors).map(([key, value]) => [`$${colorName}-${key}`, value])
-            )
-        };
-
-        writeFileSync(
-            join(outputDir, 'colors', `${colorName}.json`),
-            JSON.stringify(colorData, null, 2)
-        );
-    });
-    console.log('✓ Built color files');
-
-    // 4. Build registry components
+    // 3. Build registry components from registry items
     await buildRegistryComponents();
 
     console.log('✅ Registry built successfully!');
 }
 
 async function buildRegistryComponents() {
-    // Build base style system (index)
-    const indexItem: RegistryItem = {
-        $schema: "https://meduza-ui.com/schema/registry-item.json",
-        name: "index",
-        type: "registry:style",
-        description: "Base style system with SCSS variables and mixins",
-        dependencies: [],
-        registryDependencies: ["utils"],
-        files: [
-            {
-                path: "assets/styles/_variables.scss",
-                content: readFileSync(join(process.cwd(), 'registry/styles/_variables.scss'), 'utf-8'),
-                type: "registry:style",
-                target: "assets/styles/_variables.scss"
-            },
-            {
-                path: "assets/styles/_mixins.scss",
-                content: readFileSync(join(process.cwd(), 'registry/styles/_mixins.scss'), 'utf-8'),
-                type: "registry:style",
-                target: "assets/styles/_mixins.scss"
-            }
-        ],
-        cssVars: {
-            light: {
-                "primary-color": "#334155",
-                "primary-foreground-color": "#f8fafc",
-                "secondary-color": "#f1f5f9",
-                "secondary-foreground-color": "#0f172a",
-                "background-color": "#ffffff",
-                "foreground-color": "#0f172a",
-                "border-color": "#e2e8f0"
-            },
-            dark: {
-                "primary-color": "#e2e8f0",
-                "primary-foreground-color": "#0f172a",
-                "secondary-color": "#1e293b",
-                "secondary-foreground-color": "#f8fafc",
-                "background-color": "#0f172a",
-                "foreground-color": "#f8fafc",
-                "border-color": "#334155"
+    for (const item of registry.items) {
+        try {
+            const registryItem = await buildRegistryItem(item);
+
+            // Write to output
+            const outputPath = join(process.cwd(), 'public/r/styles/default', `${item.name}.json`);
+            writeFileSync(outputPath, JSON.stringify(registryItem, null, 2));
+
+            console.log(`📦 Built component: ${item.name}`);
+        } catch (error) {
+            console.error(`❌ Error building ${item.name}:`, error);
+        }
+    }
+}
+
+async function buildRegistryItem(item: any): Promise<RegistryItem> {
+    const files = [];
+
+    for (const fileConfig of item.files) {
+        let sourcePath: string;
+        let content: string;
+
+        if (fileConfig.path.endsWith('.vue')) {
+            // Read Vue component from registry directory
+            sourcePath = join(process.cwd(), 'registry/default', fileConfig.path);
+        } else if (fileConfig.path.endsWith('.scss')) {
+            // Read SCSS files from styles directory
+            const scssFileName = fileConfig.path.replace('assets/styles/', '');
+            sourcePath = join(process.cwd(), 'registry/styles', scssFileName);
+        } else {
+            // Read TS files from app directory (in main app for utils)
+            if (fileConfig.path === 'lib/utils.ts') {
+                sourcePath = join(process.cwd(), 'app', fileConfig.path);
+            } else {
+                sourcePath = join(process.cwd(), 'registry/default', fileConfig.path);
             }
         }
-    };
 
-    writeFileSync(
-        join(process.cwd(), 'public/r/styles/default/index.json'),
-        JSON.stringify(indexItem, null, 2)
-    );
-    console.log('✓ Built index style');
+        try {
+            content = readFileSync(sourcePath, 'utf-8');
+        } catch (error) {
+            console.warn(`⚠️  Could not read file: ${sourcePath}`);
+            content = `// File not found: ${fileConfig.path}`;
+        }
 
-    // Build utils
-    const utilsItem: RegistryItem = {
+        files.push({
+            path: fileConfig.path,
+            content,
+            type: fileConfig.type,
+            target: fileConfig.target || fileConfig.path
+        });
+    }
+
+    return {
         $schema: "https://meduza-ui.com/schema/registry-item.json",
-        name: "utils",
-        type: "registry:lib",
-        description: "BEM className utility for Vue components",
-        dependencies: [],
-        files: [
-            {
-                path: "lib/utils.ts",
-                content: readFileSync(join(process.cwd(), 'registry/default/lib/utils.ts'), 'utf-8'),
-                type: "registry:lib",
-                target: "lib/utils.ts"
-            }
-        ]
+        ...item,
+        files
     };
-
-    writeFileSync(
-        join(process.cwd(), 'public/r/styles/default/utils.json'),
-        JSON.stringify(utilsItem, null, 2)
-    );
-    console.log('✓ Built utils');
 }
 
 // Run if called directly

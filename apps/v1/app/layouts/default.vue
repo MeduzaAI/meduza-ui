@@ -1,3 +1,7 @@
+<script setup lang="ts">
+import Button from "@/../registry/default/ui/button.vue";
+</script>
+
 <template>
   <div class="app">
     <header class="header">
@@ -5,6 +9,8 @@
     </header>
     <main class="main">
       <slot />
+
+      <Button>Test Button</Button>
     </main>
   </div>
 </template>

@@ -1,0 +1,178 @@
+// Comprehensive design system variables matching spec 03
+// Colors will be injected by CLI based on user's base color choice
+
+:root {
+    /* Colors - Semantic (injected by CLI) */
+    --primary-color: #334155;
+    --primary-foreground-color: #f8fafc;
+    --secondary-color: #f1f5f9;
+    --secondary-foreground-color: #0f172a;
+    --accent-color: #3b82f6;
+    --accent-foreground-color: #ffffff;
+    --destructive-color: #ef4444;
+    --destructive-foreground-color: #ffffff;
+    --warning-color: #f59e0b;
+    --warning-foreground-color: #ffffff;
+    --success-color: #10b981;
+    --success-foreground-color: #ffffff;
+    --info-color: #06b6d4;
+    --info-foreground-color: #ffffff;
+
+    /* Surface colors */
+    --background-color: #ffffff;
+    --foreground-color: #0f172a;
+    --surface-color: #ffffff;
+    --surface-foreground-color: #0f172a;
+    --card-color: #ffffff;
+    --card-foreground-color: #0f172a;
+    --popover-color: #ffffff;
+    --popover-foreground-color: #0f172a;
+
+    /* Border and outline */
+    --border-color: #e2e8f0;
+    --input-color: #e2e8f0;
+    --ring-color: #3b82f6;
+    --outline-color: #94a3b8;
+
+    /* Muted colors */
+    --muted-color: #f8fafc;
+    --muted-foreground-color: #64748b;
+
+    /* Spacing - comprehensive scale in pixels */
+    --spacing-0: 0px;
+    --spacing-px: 1px;
+    --spacing-0-5: 2px;
+    --spacing-1: 4px;
+    --spacing-1-5: 6px;
+    --spacing-2: 8px;
+    --spacing-2-5: 10px;
+    --spacing-3: 12px;
+    --spacing-3-5: 14px;
+    --spacing-4: 16px;
+    --spacing-5: 20px;
+    --spacing-6: 24px;
+    --spacing-7: 28px;
+    --spacing-8: 32px;
+    --spacing-9: 36px;
+    --spacing-10: 40px;
+    --spacing-11: 44px;
+    --spacing-12: 48px;
+    --spacing-14: 56px;
+    --spacing-16: 64px;
+    --spacing-20: 80px;
+    --spacing-24: 96px;
+    --spacing-28: 112px;
+    --spacing-32: 128px;
+
+    /* Typography - semantic naming */
+    --font-heading: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-mono: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', monospace;
+
+    /* Font sizes - pixels */
+    --text-xs: 12px;
+    --text-sm: 14px;
+    --text-base: 16px;
+    --text-lg: 18px;
+    --text-xl: 20px;
+    --text-2xl: 24px;
+    --text-3xl: 30px;
+    --text-4xl: 36px;
+    --text-5xl: 48px;
+    --text-6xl: 60px;
+
+    /* Semantic text sizes */
+    --text-caption: var(--text-xs);
+    --text-body: var(--text-base);
+    --text-lead: var(--text-lg);
+    --text-subhead: var(--text-xl);
+    --text-heading: var(--text-2xl);
+    --text-title: var(--text-3xl);
+    --text-display: var(--text-4xl);
+
+    /* Font weights */
+    --font-light: 300;
+    --font-regular: 400;
+    --font-medium: 500;
+    --font-semibold: 600;
+    --font-bold: 700;
+
+    /* Line heights */
+    --leading-none: 1;
+    --leading-tight: 1.25;
+    --leading-snug: 1.375;
+    --leading-normal: 1.5;
+    --leading-relaxed: 1.625;
+    --leading-loose: 2;
+
+    /* Border radius - pixels */
+    --radius-none: 0px;
+    --radius-sm: 2px;
+    --radius-base: 4px;
+    --radius-md: 6px;
+    --radius-lg: 8px;
+    --radius-xl: 12px;
+    --radius-2xl: 16px;
+    --radius-3xl: 24px;
+    --radius-full: 9999px;
+
+    /* Default radius for components */
+    --radius: 6px;
+
+    /* Shadows - pixels */
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+    --shadow-base: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+
+    /* Transitions */
+    --transition-fast: 0.15s ease;
+    --transition-base: 0.2s ease;
+    --transition-slow: 0.3s ease;
+
+    /* Z-index scale */
+    --z-dropdown: 1000;
+    --z-sticky: 1020;
+    --z-fixed: 1030;
+    --z-modal-backdrop: 1040;
+    --z-modal: 1050;
+    --z-popover: 1060;
+    --z-tooltip: 1070;
+}
+
+[data-theme="dark"] {
+    /* Dark mode color overrides (injected by CLI) */
+    --primary-color: #e2e8f0;
+    --primary-foreground-color: #0f172a;
+    --secondary-color: #1e293b;
+    --secondary-foreground-color: #f8fafc;
+    --accent-color: #60a5fa;
+    --accent-foreground-color: #1e293b;
+    --destructive-color: #f87171;
+    --destructive-foreground-color: #1e293b;
+    --warning-color: #fbbf24;
+    --warning-foreground-color: #1e293b;
+    --success-color: #34d399;
+    --success-foreground-color: #1e293b;
+    --info-color: #22d3ee;
+    --info-foreground-color: #1e293b;
+
+    --background-color: #0f172a;
+    --foreground-color: #f8fafc;
+    --surface-color: #1e293b;
+    --surface-foreground-color: #f8fafc;
+    --card-color: #1e293b;
+    --card-foreground-color: #f8fafc;
+    --popover-color: #1e293b;
+    --popover-foreground-color: #f8fafc;
+
+    --border-color: #334155;
+    --input-color: #334155;
+    --ring-color: #60a5fa;
+    --outline-color: #64748b;
+
+    --muted-color: #1e293b;
+    --muted-foreground-color: #94a3b8;
+}

@@ -1,0 +1,85 @@
+{
+  "name": "meduza-ui",
+  "items": [
+    {
+      "name": "button",
+      "type": "registry:ui",
+      "description": "A flexible button component with multiple variants and sizes",
+      "dependencies": [],
+      "registryDependencies": [
+        "utils"
+      ],
+      "files": [
+        {
+          "path": "registry/default/ui/button.vue",
+          "type": "file",
+          "target": "components/ui/button.vue",
+          "content": "<script setup lang=\"ts\">\nimport { computed } from 'vue'\nimport { useClassName } from '@/lib/utils'\n\n// Enums for type safety\nenum ButtonVariant {\n  Primary = 'primary',\n  Secondary = 'secondary',\n  Outline = 'outline',\n  Ghost = 'ghost',\n  Destructive = 'destructive'\n}\n\nenum ButtonSize {\n  Small = 'sm',\n  Medium = 'md',\n  Large = 'lg'\n}\n\ninterface ButtonProps {\n  variant?: ButtonVariant\n  size?: ButtonSize\n  disabled?: boolean\n  type?: 'button' | 'submit' | 'reset'\n}\n\nconst props = withDefaults(defineProps<ButtonProps>(), {\n  variant: ButtonVariant.Primary,\n  size: ButtonSize.Medium,\n  disabled: false,\n  type: 'button'\n})\n\n// Root class using component name in kebab-case\nconst { b } = useClassName('button')\n\nconst buttonClasses = computed(() => {\n  return b([\n    props.variant,\n    props.size,\n    { disabled: props.disabled }\n  ])\n})\n</script>\n\n<template>\n  <button\n    :class=\"buttonClasses\"\n    :disabled=\"disabled\"\n    :type=\"type\"\n    v-bind=\"$attrs\"\n  >\n    <slot />\n  </button>\n</template>\n\n<style lang=\"scss\" scoped>\n.button {\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  white-space: nowrap;\n  border-radius: var(--radius-md);\n  transition: var(--transition-base);\n  cursor: pointer;\n  border: 1px solid transparent;\n\n  @include text('text-sm-medium');\n  @include focus-ring;\n\n  // Variants\n  &--primary {\n    background-color: var(--primary-color);\n    color: var(--primary-foreground-color);\n\n    &:hover:not(.button--disabled) {\n      opacity: 0.9;\n    }\n  }\n\n  &--secondary {\n    background-color: var(--secondary-color);\n    color: var(--secondary-foreground-color);\n\n    &:hover:not(.button--disabled) {\n      background-color: var(--secondary-color);\n      opacity: 0.8;\n    }\n  }\n\n  &--outline {\n    border-color: var(--border-color);\n    background-color: var(--background-color);\n    color: var(--foreground-color);\n\n    &:hover:not(.button--disabled) {\n      background-color: var(--accent-color);\n      color: var(--accent-foreground-color);\n    }\n  }\n\n  &--ghost {\n    background-color: transparent;\n    color: var(--foreground-color);\n\n    &:hover:not(.button--disabled) {\n      background-color: var(--accent-color);\n      color: var(--accent-foreground-color);\n    }\n  }\n\n  &--destructive {\n    background-color: var(--destructive-color);\n    color: var(--destructive-foreground-color);\n\n    &:hover:not(.button--disabled) {\n      opacity: 0.9;\n    }\n  }\n\n  // Sizes\n  &--sm {\n    height: 36px;\n    padding: 0 var(--spacing-3);\n    @include text('text-sm-medium');\n  }\n\n  &--md {\n    height: 40px;\n    padding: 0 var(--spacing-4);\n    @include text('text-sm-medium');\n  }\n\n  &--lg {\n    height: 44px;\n    padding: 0 var(--spacing-6);\n    @include text('text-base-medium');\n  }\n\n  // States\n  &--disabled {\n    opacity: 0.5;\n    cursor: not-allowed;\n  }\n}\n</style>\n"
+        }
+      ],
+      "$schema": "https://meduza-ui.dev/schema/registry-item.json"
+    },
+    {
+      "name": "utils",
+      "type": "registry:lib",
+      "description": "BEM className utility for Vue components",
+      "dependencies": [],
+      "files": [
+        {
+          "path": "registry/default//lib/utils.ts",
+          "type": "file",
+          "target": "lib/utils.ts",
+          "content": "/**\n * @name utils  \n * @description BEM className utility for Vue components\n * @type registry:lib\n * @dependencies []\n */\n\n// Types for BEM className utility\ntype BemModifiers = Record<string, boolean>;\n\ninterface BemClassNameOptions {\n    prefix?: string;\n    separator?: {\n        element?: string;\n        modifier?: string;\n    };\n}\n\ninterface BemElement {\n    m: (modifiers: string | string[] | BemModifiers) => string;\n}\n\ninterface BemBlock {\n    (modifiers?: string | string[] | BemModifiers): string;\n    e: (element: string) => BemElement;\n    m: (modifiers: string | string[] | BemModifiers) => string;\n}\n\ninterface UseClassNameReturn {\n    b: BemBlock;\n    e: (element: string) => BemElement;\n    m: (modifiers: string | string[] | BemModifiers) => string;\n}\n\nexport function useClassName(block: string, options?: BemClassNameOptions): UseClassNameReturn {\n    const config = {\n        prefix: '',\n        separator: {\n            element: '__',\n            modifier: '--',\n        },\n        ...options,\n    };\n\n    const getBlockName = (): string => {\n        return config.prefix ? `${config.prefix}-${block}` : block;\n    };\n\n    const generateModifiers = (\n        base: string,\n        modifiers: string | string[] | BemModifiers\n    ): string[] => {\n        const classes = [base];\n\n        if (typeof modifiers === 'string') {\n            classes.push(`${base}${config.separator.modifier}${modifiers}`);\n        } else if (Array.isArray(modifiers)) {\n            modifiers.forEach(mod => {\n                classes.push(`${base}${config.separator.modifier}${mod}`);\n            });\n        } else if (modifiers && typeof modifiers === 'object') {\n            Object.entries(modifiers).forEach(([key, value]) => {\n                if (value) {\n                    classes.push(`${base}${config.separator.modifier}${key}`);\n                }\n            });\n        }\n\n        return classes;\n    };\n\n    const b: BemBlock = ((modifiers?: string | string[] | BemModifiers) => {\n        const blockName = getBlockName();\n\n        if (!modifiers) {\n            return blockName;\n        }\n\n        return generateModifiers(blockName, modifiers).join(' ');\n    }) as BemBlock;\n\n    const e = (element: string): BemElement => {\n        const elementName = `${getBlockName()}${config.separator.element}${element}`;\n\n        const elementObj: BemElement = {\n            m: (modifiers: string | string[] | BemModifiers): string => {\n                return generateModifiers(elementName, modifiers).join(' ');\n            },\n        };\n\n        return elementObj;\n    };\n\n    const m = (modifiers: string | string[] | BemModifiers): string => {\n        return generateModifiers(getBlockName(), modifiers).join(' ');\n    };\n\n    // Add element and modifier methods to block function\n    b.e = e;\n    b.m = m;\n\n    return { b, e, m };\n}\n\n// Simple utility for combining classes\nexport function cn(...classes: (string | undefined | null | boolean | Record<string, boolean>)[]): string {\n    const result: string[] = [];\n\n    for (const cls of classes) {\n        if (!cls) continue;\n\n        if (typeof cls === 'string') {\n            result.push(cls);\n        } else if (typeof cls === 'object') {\n            for (const [key, value] of Object.entries(cls)) {\n                if (value) {\n                    result.push(key);\n                }\n            }\n        }\n    }\n\n    return result.join(' ');\n}\n\nexport const metadata = {\n    name: \"utils\",\n    type: \"registry:lib\" as const,\n    description: \"BEM className utility with configuration support for Vue components\",\n    dependencies: [],\n    files: [\n        {\n            path: \"lib/utils.ts\",\n            type: \"registry:lib\" as const,\n            target: \"lib/utils.ts\"\n        }\n    ]\n};\n"
+        }
+      ],
+      "$schema": "https://meduza-ui.dev/schema/registry-item.json"
+    },
+    {
+      "name": "index",
+      "type": "registry:style",
+      "description": "Base style system with SCSS variables and mixins",
+      "dependencies": [],
+      "registryDependencies": [
+        "utils"
+      ],
+      "files": [
+        {
+          "path": "registry/default/assets/styles/_variables.scss",
+          "type": "file",
+          "target": "assets/styles/_variables.scss"
+        },
+        {
+          "path": "registry/default/assets/styles/_mixins.scss",
+          "type": "file",
+          "target": "assets/styles/_mixins.scss"
+        },
+        {
+          "path": "registry/default/assets/styles/_main.scss",
+          "type": "file",
+          "target": "assets/styles/_main.scss"
+        }
+      ],
+      "cssVars": {
+        "light": {
+          "primary-color": "#334155",
+          "primary-foreground-color": "#f8fafc",
+          "secondary-color": "#f1f5f9",
+          "secondary-foreground-color": "#0f172a",
+          "background-color": "#ffffff",
+          "foreground-color": "#0f172a",
+          "border-color": "#e2e8f0"
+        },
+        "dark": {
+          "primary-color": "#e2e8f0",
+          "primary-foreground-color": "#0f172a",
+          "secondary-color": "#1e293b",
+          "secondary-foreground-color": "#f8fafc",
+          "background-color": "#0f172a",
+          "foreground-color": "#f8fafc",
+          "border-color": "#334155"
+        }
+      },
+      "$schema": "https://meduza-ui.dev/schema/registry-item.json"
+    }
+  ]
+}
