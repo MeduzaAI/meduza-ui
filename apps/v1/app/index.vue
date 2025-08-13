@@ -1,3 +1,12 @@
+<script setup lang="ts">
+
+import { useClassName} from "@/lib/utils";
+
+const cn = useClassName('button')
+
+console.log(cn)
+</script>
+
 <template>
   <div>
     <h1>Welcome to Meduza UI</h1>

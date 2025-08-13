@@ -40,19 +40,19 @@
       ],
       "files": [
         {
-          "path": "registry/default/assets/styles/_variables.scss",
+          "path": "registry/styles/_variables.scss",
           "type": "file",
           "target": "assets/styles/_variables.scss"
         },
         {
-          "path": "registry/default/assets/styles/_mixins.scss",
+          "path": "registry/styles/_mixins.scss",
           "type": "file",
           "target": "assets/styles/_mixins.scss"
         },
         {
-          "path": "registry/default/assets/styles/_main.scss",
+          "path": "registry/styles/_main.scss",
           "type": "file",
-          "target": "assets/styles/_main.scss"
+          "target": "assets/styles/main.scss"
         }
       ],
       "cssVars": {

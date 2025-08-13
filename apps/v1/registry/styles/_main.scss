@@ -2,7 +2,7 @@
 // This file should be imported in the root of your application
 // Example: import '@/assets/styles/main.scss' in your main.js/app.vue
 
-@import 'variables';
-@import 'mixins';
+@use 'variables';
+@use 'mixins';
 
 
