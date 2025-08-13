@@ -39,8 +39,7 @@ vi.mock("../../registry/api", () => ({
             cssVarsTemplate: ":root {\n  --primary-color: #0f172a;\n}",
         })
     ),
-    createVariablesFile: vi.fn(() => Promise.resolve()),
-    createMixinsFile: vi.fn(() => Promise.resolve()),
+    injectColorsIntoVariablesFile: vi.fn(() => Promise.resolve()),
 }))
 
 vi.mock("../../utils/add-components", () => ({
@@ -244,7 +243,7 @@ describe("init command", () => {
             ["utils", "index"],
             expect.objectContaining({
                 registries: expect.objectContaining({
-                    "meduza-ui": "https://meduza-ui.com/r",
+                    "meduza-ui": "http://localhost:3000/r",
                 }),
             }),
             {
@@ -256,7 +255,7 @@ describe("init command", () => {
     })
 
     it("should call color injection functions", async () => {
-        const { fetchColorData, createVariablesFile, createMixinsFile } = await import("../../registry/api")
+        const { fetchColorData, injectColorsIntoVariablesFile } = await import("../../registry/api")
 
         await runInit({
             cwd: testDir,
@@ -268,8 +267,7 @@ describe("init command", () => {
             baseColor: "zinc",
         })
 
-        expect(fetchColorData).toHaveBeenCalledWith("zinc", "https://meduza-ui.com/r")
-        expect(createVariablesFile).toHaveBeenCalled()
-        expect(createMixinsFile).toHaveBeenCalled()
+        expect(fetchColorData).toHaveBeenCalledWith("zinc", "http://localhost:3000/r")
+        expect(injectColorsIntoVariablesFile).toHaveBeenCalled()
     })
 })

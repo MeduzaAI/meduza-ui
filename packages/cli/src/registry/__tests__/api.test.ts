@@ -6,8 +6,7 @@ import {
     fetchRegistryItem,
     fetchColorData,
     getAvailableColors,
-    createVariablesFile,
-    createMixinsFile,
+    injectColorsIntoVariablesFile,
 } from "../api"
 
 // Mock node-fetch
@@ -118,79 +117,66 @@ describe("Registry API", () => {
         })
     })
 
-    describe("createVariablesFile", () => {
-        it("should create variables file with color data", async () => {
-            const variablesPath = join(testDir, "assets/styles/_variables.scss")
+    describe("injectColorsIntoVariablesFile", () => {
+        it("should inject colors into existing variables file", async () => {
+            const variablesPath = join(testDir, "_variables.scss")
+
+            // Create a variables file with existing content (like from registry)
+            const existingContent = `:root {
+    /* Colors - Semantic */
+    --primary-color: #334155;
+    --background-color: #ffffff;
+
+    /* Surface colors */
+    --surface-color: #ffffff;
+    --card-color: #ffffff;
+}
+
+[data-theme="dark"] {
+    --primary-color: #e2e8f0;
+    --background-color: #0f172a;
+}`
+
+            await fs.writeFile(variablesPath, existingContent, "utf8")
+
             const colorData = {
-                inlineColors: {
-                    light: { primary: "slate-900" },
-                    dark: { primary: "slate-50" },
-                },
+                name: "zinc",
+                label: "Zinc",
                 cssVars: {
-                    light: { "primary-color": "#0f172a", "background-color": "#ffffff" },
-                    dark: { "primary-color": "#f8fafc", "background-color": "#0f172a" },
+                    light: {
+                        "primary-color": "#18181b",
+                        "background-color": "#fafafa",
+                    },
+                    dark: {
+                        "primary-color": "#fafafa",
+                        "background-color": "#18181b",
+                    },
                 },
-                cssVarsTemplate: "",
             }
 
-            await createVariablesFile(variablesPath, colorData)
+            await injectColorsIntoVariablesFile(variablesPath, colorData)
 
-            expect(await fs.pathExists(variablesPath)).toBe(true)
             const content = await fs.readFile(variablesPath, "utf8")
-
-            // Check that color variables are injected
-            expect(content).toContain("--primary-color: #0f172a;")
-            expect(content).toContain("--background-color: #ffffff;")
-            expect(content).toContain("[data-theme=\"dark\"]")
-            expect(content).toContain("--primary-color: #f8fafc;")
-
-            // Check that design system variables are included
-            expect(content).toContain("--spacing-4: 16px;")
-            expect(content).toContain("--text-base: 16px;")
-            expect(content).toContain("--radius-base: 4px;")
-            expect(content).toContain("--font-regular: 400;")
+            expect(content).toContain("--primary-color: #18181b")
+            expect(content).toContain("--background-color: #fafafa")
+            expect(content).toContain("--primary-color: #fafafa")
+            expect(content).toContain("--background-color: #18181b")
         })
 
-        it("should create directory if it doesn't exist", async () => {
-            const variablesPath = join(testDir, "nested/deep/styles/_variables.scss")
+        it("should throw error if variables file doesn't exist", async () => {
+            const variablesPath = join(testDir, "_variables.scss")
+
             const colorData = {
-                inlineColors: { light: {}, dark: {} },
-                cssVars: { light: {}, dark: {} },
-                cssVarsTemplate: "",
+                name: "zinc",
+                label: "Zinc",
+                cssVars: {
+                    light: { "primary-color": "#18181b" },
+                    dark: { "primary-color": "#fafafa" },
+                },
             }
 
-            await createVariablesFile(variablesPath, colorData)
-
-            expect(await fs.pathExists(variablesPath)).toBe(true)
-            expect(await fs.pathExists(join(testDir, "nested/deep/styles"))).toBe(true)
-        })
-    })
-
-    describe("createMixinsFile", () => {
-        it("should create mixins file with utilities", async () => {
-            const mixinsPath = join(testDir, "assets/styles/_mixins.scss")
-
-            await createMixinsFile(mixinsPath)
-
-            expect(await fs.pathExists(mixinsPath)).toBe(true)
-            const content = await fs.readFile(mixinsPath, "utf8")
-
-            // Check that mixins are included
-            expect(content).toContain("@mixin focus-ring")
-            expect(content).toContain("@mixin text(")
-            expect(content).toContain("@mixin container(")
-            expect(content).toContain("&:focus-visible")
-            expect(content).toContain("font-size: var(--text-base);")
-            expect(content).toContain("max-width: 1024px;")
-        })
-
-        it("should create directory if it doesn't exist", async () => {
-            const mixinsPath = join(testDir, "nested/styles/_mixins.scss")
-
-            await createMixinsFile(mixinsPath)
-
-            expect(await fs.pathExists(mixinsPath)).toBe(true)
-            expect(await fs.pathExists(join(testDir, "nested/styles"))).toBe(true)
+            await expect(injectColorsIntoVariablesFile(variablesPath, colorData))
+                .rejects.toThrow("Variables file not found")
         })
     })
 })

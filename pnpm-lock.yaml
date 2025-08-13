@@ -165,6 +165,9 @@ importers:
       rimraf:
         specifier: ^5.0.5
         version: 5.0.10
+      sass-migrator:
+        specifier: ^2.4.2
+        version: 2.4.2
       tsx:
         specifier: ^4.19.2
         version: 4.20.3
@@ -7159,6 +7162,11 @@ packages:
   sass-embedded@1.90.0:
     resolution: {integrity: sha512-XP1EltyLLfuU5FsGVjSz8PcT925oA3rDnJTWOEBHR42k62ZEbKTcZ4gVlFwKi0Ggzi5E8v1K2BplD8ELHwusYg==}
     engines: {node: '>=16.0.0'}
+    hasBin: true
+
+  sass-migrator@2.4.2:
+    resolution: {integrity: sha512-YNvfvXtlP91H1YJ/csKs9IL3SnGHfAJNU/en/AfJmKKcFpouYX8K1NsQ+3hqyo9rP1zGPrlNM3Lp7mteeXReyQ==}
+    engines: {node: '>=10.12.0'}
     hasBin: true
 
   sass@1.90.0:
@@ -16804,6 +16812,8 @@ snapshots:
       sass-embedded-win32-arm64: 1.90.0
       sass-embedded-win32-x64: 1.90.0
     optional: true
+
+  sass-migrator@2.4.2: {}
 
   sass@1.90.0:
     dependencies:

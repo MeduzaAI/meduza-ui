@@ -6,7 +6,7 @@ import { fileURLToPath } from "url"
 // Import commands
 import { build } from "@/commands/build"
 import { init } from "@/commands/init"
-// import { add } from "@/commands/add"     - will be implemented in future spec
+import { add } from "@/commands/add"
 
 const __dirname = fileURLToPath(new URL(".", import.meta.url))
 
@@ -35,9 +35,7 @@ async function main() {
     // Add commands
     program.addCommand(build)
     program.addCommand(init)
-
-    // Additional commands will be added in subsequent specs
-    // program.addCommand(add)   - future spec
+    program.addCommand(add)
 
     // For now, show help when no command is provided
     if (process.argv.length <= 2) {

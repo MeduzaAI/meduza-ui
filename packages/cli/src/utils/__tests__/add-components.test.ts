@@ -17,6 +17,7 @@ vi.mock("../../registry/api", () => ({
 
 vi.mock("../updaters/update-files", () => ({
     updateFiles: vi.fn(),
+    updateFilesWithConflictCheck: vi.fn(),
 }))
 
 vi.mock("../updaters/update-dependencies", () => ({
@@ -60,7 +61,7 @@ describe("addComponents", () => {
 
     it("should fetch and install components", async () => {
         const { fetchRegistryItem } = await import("../../registry/api")
-        const { updateFiles } = await import("../updaters/update-files")
+        const { updateFilesWithConflictCheck } = await import("../updaters/update-files")
         const { updateDependencies } = await import("../updaters/update-dependencies")
 
         const mockItem: RegistryItem = {
@@ -84,7 +85,7 @@ describe("addComponents", () => {
 
         expect(fetchRegistryItem).toHaveBeenCalledWith("https://meduza-ui.com/r", "button")
         expect(updateDependencies).toHaveBeenCalledWith(["vue"], ["@types/node"], mockConfig, { silent: true })
-        expect(updateFiles).toHaveBeenCalledWith(mockItem.files, mockConfig, { overwrite: false, silent: true })
+        expect(updateFilesWithConflictCheck).toHaveBeenCalledWith(mockItem.files, mockConfig, { overwrite: false, silent: true })
     })
 
     it("should handle registry dependencies recursively", async () => {

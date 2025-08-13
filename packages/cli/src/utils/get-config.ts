@@ -3,6 +3,7 @@ import fs from "fs-extra"
 import * as path from "path"
 import { z } from "zod"
 import { configSchema, rawConfigSchema, DEFAULT_CONFIG, type Config, type RawConfig } from "../registry/schema"
+import { getProjectInfo, type ProjectInfo } from "./get-project-info"
 
 const MEDUZA_CONFIG_FILES = [
     "meduza.config.js",
@@ -55,6 +56,9 @@ export async function resolveConfigPaths(
         },
     }
 
+    // Get project info for intelligent path resolution
+    const projectInfo = await getProjectInfo(cwd)
+
     return configSchema.parse({
         ...mergedConfig,
         resolvedPaths: {
@@ -62,21 +66,28 @@ export async function resolveConfigPaths(
             scssVariables: path.resolve(cwd, mergedConfig.scss.variables),
             scssMixins: path.resolve(cwd, mergedConfig.scss.mixins),
             scssMain: path.resolve(cwd, mergedConfig.scss.main),
-            components: await resolveAlias(cwd, mergedConfig.aliases.components),
-            ui: await resolveAlias(cwd, mergedConfig.aliases.ui),
-            lib: await resolveAlias(cwd, mergedConfig.aliases.lib),
-            utils: await resolveAlias(cwd, mergedConfig.aliases.utils),
-            composables: await resolveAlias(cwd, mergedConfig.aliases.composables || "@/composables"),
-            assets: await resolveAlias(cwd, mergedConfig.aliases.assets || "@/assets"),
-            styles: await resolveAlias(cwd, mergedConfig.aliases.styles || "@/assets/styles")
+            components: await resolveAlias(cwd, mergedConfig.aliases.components, projectInfo),
+            ui: await resolveAlias(cwd, mergedConfig.aliases.ui, projectInfo),
+            lib: await resolveAlias(cwd, mergedConfig.aliases.lib, projectInfo),
+            utils: await resolveAlias(cwd, mergedConfig.aliases.utils, projectInfo),
+            composables: await resolveAlias(cwd, mergedConfig.aliases.composables || "@/composables", projectInfo),
+            assets: await resolveAlias(cwd, mergedConfig.aliases.assets || "@/assets", projectInfo),
+            styles: await resolveAlias(cwd, mergedConfig.aliases.styles || "@/assets/styles", projectInfo)
         },
     })
 }
 
-async function resolveAlias(cwd: string, alias: string): Promise<string> {
+async function resolveAlias(cwd: string, alias: string, projectInfo: ProjectInfo | null): Promise<string> {
     // Handle @ alias
     if (alias.startsWith("@/")) {
         const relativePath = alias.slice(2)
+
+        // Use project info to determine the correct base directory
+        if (projectInfo?.baseDir) {
+            return path.resolve(cwd, projectInfo.baseDir, relativePath)
+        }
+
+        // Fallback to the old logic if project info is not available
         const srcPath = path.resolve(cwd, "src", relativePath)
         const appPath = path.resolve(cwd, "app", relativePath)
         const rootPath = path.resolve(cwd, relativePath)

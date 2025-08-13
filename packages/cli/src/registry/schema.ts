@@ -180,7 +180,26 @@ export const registrySchema = z.object({
   items: z.array(registryItemSchema),
 });
 
+// Registry index schema (simplified registry item for listing)
+export const registryIndexItemSchema = z.object({
+  name: z.string(),
+  type: z.enum([
+    "registry:component",
+    "registry:ui",
+    "registry:composable",
+    "registry:lib",
+    "registry:theme",
+    "registry:style",
+  ]),
+  description: z.string().optional(),
+  category: z.string().optional(),
+});
+
+export const registryIndexSchema = z.array(registryIndexItemSchema);
+
 export type RegistryFile = z.infer<typeof registryFileSchema>;
 export type RegistryItem = z.infer<typeof registryItemSchema>;
 export type Registry = z.infer<typeof registrySchema>;
 export type RegistryBaseColor = z.infer<typeof registryBaseColorSchema>;
+export type RegistryIndexItem = z.infer<typeof registryIndexItemSchema>;
+export type RegistryIndex = z.infer<typeof registryIndexSchema>;

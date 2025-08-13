@@ -13,8 +13,7 @@ import { addComponents } from "@/utils/add-components";
 import {
   getAvailableColors,
   fetchColorData,
-  createVariablesFile,
-  createMixinsFile,
+  injectColorsIntoVariablesFile,
 } from "@/registry/api";
 import {
   type Config,
@@ -315,6 +314,12 @@ async function injectColorVariables(
   config: Config,
   options: z.infer<typeof initOptionsSchema>,
 ) {
+  // Only inject colors if user selected a non-default color
+  if (baseColor === "slate") {
+    // Registry already has slate as default, no injection needed
+    return;
+  }
+
   if (!options.silent) {
     logger.spin(`Injecting ${baseColor} color variables...`);
   }
@@ -332,11 +337,8 @@ async function injectColorVariables(
       .replace("{name}", "");
     const colorData = await fetchColorData(baseColor, baseUrl);
 
-    // Create variables file with selected colors
-    await createVariablesFile(config.resolvedPaths.scssVariables, colorData);
-
-    // Create mixins file
-    await createMixinsFile(config.resolvedPaths.scssMixins);
+    // Inject colors into the existing variables file (created by registry)
+    await injectColorsIntoVariablesFile(config.resolvedPaths.scssVariables, colorData);
 
     if (!options.silent) {
       logger.stopSpinner(true, `Injected ${baseColor} color variables.`);
