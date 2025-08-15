@@ -5,7 +5,7 @@ export const themes: RegistryItem[] = [
     name: "index",
     type: "registry:style",
     description: "Base style system with SCSS variables and mixins",
-    dependencies: [],
+    dependencies: ['sass'],
     registryDependencies: ["utils"],
     files: [
       {
