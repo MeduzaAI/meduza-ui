@@ -156,7 +156,7 @@ async function promptForConfig(
   projectInfo: ProjectInfo,
   options: z.infer<typeof initOptionsSchema>,
 ): Promise<RawConfig> {
-  const colors = getAvailableColors();
+  const colors = await getAvailableColors();
 
   const responses = await prompts([
     {

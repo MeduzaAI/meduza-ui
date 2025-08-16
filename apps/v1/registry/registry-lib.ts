@@ -1,6 +1,6 @@
-import { type RegistryItem } from "../lib/registry-schema"
+import type { Registry } from "meduza-ui/registry"
 
-export const lib: RegistryItem[] = [
+export const lib: Registry["items"] = [
     {
         name: "utils",
         type: "registry:lib",

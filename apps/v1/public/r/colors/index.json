@@ -4,19 +4,39 @@
     "label": "Slate"
   },
   {
-    "name": "gray",
-    "label": "Gray"
-  },
-  {
     "name": "zinc",
     "label": "Zinc"
+  },
+  {
+    "name": "stone",
+    "label": "Stone"
+  },
+  {
+    "name": "gray",
+    "label": "Gray"
   },
   {
     "name": "neutral",
     "label": "Neutral"
   },
   {
-    "name": "stone",
-    "label": "Stone"
+    "name": "midnight-blue",
+    "label": "Midnight Blue"
+  },
+  {
+    "name": "ocean-breeze",
+    "label": "Ocean Breeze"
+  },
+  {
+    "name": "forest-green",
+    "label": "Forest Green"
+  },
+  {
+    "name": "sunset-orange",
+    "label": "Sunset Orange"
+  },
+  {
+    "name": "minimal-gray",
+    "label": "Minimal Gray"
   }
 ]

@@ -7,6 +7,7 @@ import { fileURLToPath } from "url"
 import { build } from "@/commands/build"
 import { init } from "@/commands/init"
 import { add } from "@/commands/add"
+import { theme } from "@/commands/theme"
 
 const __dirname = fileURLToPath(new URL(".", import.meta.url))
 
@@ -36,6 +37,7 @@ async function main() {
     program.addCommand(build)
     program.addCommand(init)
     program.addCommand(add)
+    program.addCommand(theme)
 
     // For now, show help when no command is provided
     if (process.argv.length <= 2) {

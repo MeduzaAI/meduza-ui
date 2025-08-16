@@ -18,7 +18,38 @@ export async function buildColorsRegistry() {
         )
     }
 
-    console.log('✅ Built colors registry')
+    // Build new themed colors
+    const themedColors = [
+        'midnight-blue',
+        'ocean-breeze',
+        'forest-green',
+        'sunset-orange',
+        'minimal-gray'
+    ]
+
+    for (const themedColorName of themedColors) {
+        const colorData = generateThemedColorData(themedColorName)
+        writeFileSync(
+            join(outputDir, `${themedColorName}.json`),
+            JSON.stringify(colorData, null, 2)
+        )
+    }
+
+    // Update colors index to include themed colors
+    const allColors = [
+        ...baseColors.map(name => ({ name, label: capitalize(name) })),
+        ...themedColors.map(name => ({
+            name,
+            label: name.split('-').map(capitalize).join(' ')
+        }))
+    ]
+
+    writeFileSync(
+        join(outputDir, 'index.json'),
+        JSON.stringify(allColors, null, 2)
+    )
+
+    console.log('✅ Built colors registry (base + themed)')
 }
 
 function generateBaseColorData(baseColor: string) {
@@ -316,7 +347,136 @@ function generateCssTemplate(baseColor: string) {
 ${lightVars}
 }
 
-[data-theme="dark"] {
+[data-mode="dark"] {
 ${darkVars}
 }`
+}
+
+// Generate themed color data using same structure as base colors
+function generateThemedColorData(themedColor: string) {
+    return {
+        inlineColors: getInlineColorsForThemedColor(themedColor),
+        cssVars: getCssVarsForThemedColor(themedColor),
+        cssVarsTemplate: generateCssTemplateForThemed(themedColor)
+    }
+}
+
+function getInlineColorsForThemedColor(themedColor: string) {
+    // For now, return midnight-blue as default
+    return {
+        light: {
+            background: "white",
+            foreground: "blue-950",
+            card: "white",
+            "card-foreground": "blue-950",
+            popover: "white",
+            "popover-foreground": "blue-950",
+            primary: "blue-700",
+            "primary-foreground": "blue-50",
+            secondary: "blue-100",
+            "secondary-foreground": "blue-900",
+            muted: "blue-100",
+            "muted-foreground": "blue-500",
+            accent: "blue-100",
+            "accent-foreground": "blue-900",
+            destructive: "red-500",
+            "destructive-foreground": "blue-50",
+            border: "blue-200",
+            input: "blue-200",
+            ring: "blue-950"
+        },
+        dark: {
+            background: "blue-950",
+            foreground: "blue-50",
+            card: "blue-950",
+            "card-foreground": "blue-50",
+            popover: "blue-950",
+            "popover-foreground": "blue-50",
+            primary: "blue-400",
+            "primary-foreground": "blue-900",
+            secondary: "blue-800",
+            "secondary-foreground": "blue-50",
+            muted: "blue-800",
+            "muted-foreground": "blue-400",
+            accent: "blue-800",
+            "accent-foreground": "blue-50",
+            destructive: "red-900",
+            "destructive-foreground": "blue-50",
+            border: "blue-800",
+            input: "blue-800",
+            ring: "blue-300"
+        }
+    }
+}
+
+function getCssVarsForThemedColor(themedColor: string) {
+    // For now, return midnight-blue as default
+    return {
+        light: {
+            "primary-color": "#1d4ed8",
+            "primary-foreground-color": "#eff6ff",
+            "secondary-color": "#dbeafe",
+            "secondary-foreground-color": "#1e3a8a",
+            "background-color": "#ffffff",
+            "foreground-color": "#1e3a8a",
+            "card-color": "#ffffff",
+            "card-foreground-color": "#1e3a8a",
+            "popover-color": "#ffffff",
+            "popover-foreground-color": "#1e3a8a",
+            "muted-color": "#dbeafe",
+            "muted-foreground-color": "#3b82f6",
+            "accent-color": "#dbeafe",
+            "accent-foreground-color": "#1e3a8a",
+            "destructive-color": "#ef4444",
+            "destructive-foreground-color": "#eff6ff",
+            "border-color": "#bfdbfe",
+            "input-color": "#bfdbfe",
+            "ring-color": "#1e3a8a"
+        },
+        dark: {
+            "primary-color": "#60a5fa",
+            "primary-foreground-color": "#1e3a8a",
+            "secondary-color": "#1e3a8a",
+            "secondary-foreground-color": "#eff6ff",
+            "background-color": "#172554",
+            "foreground-color": "#eff6ff",
+            "card-color": "#172554",
+            "card-foreground-color": "#eff6ff",
+            "popover-color": "#172554",
+            "popover-foreground-color": "#eff6ff",
+            "muted-color": "#1e3a8a",
+            "muted-foreground-color": "#60a5fa",
+            "accent-color": "#1e3a8a",
+            "accent-foreground-color": "#eff6ff",
+            "destructive-color": "#dc2626",
+            "destructive-foreground-color": "#eff6ff",
+            "border-color": "#1e3a8a",
+            "input-color": "#1e3a8a",
+            "ring-color": "#93c5fd"
+        }
+    }
+}
+
+function generateCssTemplateForThemed(themedColor: string) {
+    const cssVars = getCssVarsForThemedColor(themedColor)
+
+    const lightVars = Object.entries(cssVars.light)
+        .map(([key, value]) => `  --${key}: ${value};`)
+        .join('\n')
+
+    const darkVars = Object.entries(cssVars.dark)
+        .map(([key, value]) => `  --${key}: ${value};`)
+        .join('\n')
+
+    return `:root {
+${lightVars}
+}
+
+[data-mode="dark"] {
+${darkVars}
+}`
+}
+
+function capitalize(str: string): string {
+    return str.charAt(0).toUpperCase() + str.slice(1)
 }

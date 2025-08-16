@@ -23,7 +23,18 @@ describe("Registry API", () => {
     })
 
     afterEach(async () => {
-        await fs.remove(testDir)
+        try {
+            await fs.remove(testDir)
+        } catch (error) {
+            // If fs.remove fails, try with Node's rmSync
+            try {
+                const nodeFs = await import('fs')
+                nodeFs.rmSync(testDir, { recursive: true, force: true })
+            } catch (e) {
+                // Ignore cleanup errors in tests
+                console.warn('Failed to cleanup test directory:', testDir)
+            }
+        }
         vi.clearAllMocks()
     })
 
@@ -108,8 +119,8 @@ describe("Registry API", () => {
     })
 
     describe("getAvailableColors", () => {
-        it("should return available color options", () => {
-            const colors = getAvailableColors()
+        it("should return available color options", async () => {
+            const colors = await getAvailableColors()
 
             expect(colors).toHaveLength(5)
             expect(colors.map((c) => c.name)).toEqual(["slate", "zinc", "stone", "gray", "neutral"])
@@ -132,7 +143,7 @@ describe("Registry API", () => {
     --card-color: #ffffff;
 }
 
-[data-theme="dark"] {
+[data-mode="dark"] {
     --primary-color: #e2e8f0;
     --background-color: #0f172a;
 }`
@@ -154,11 +165,12 @@ describe("Registry API", () => {
                 },
             }
 
-            await injectColorsIntoVariablesFile(variablesPath, colorData)
+            await injectColorsIntoVariablesFile(variablesPath, colorData, { asTheme: false })
 
             const content = await fs.readFile(variablesPath, "utf8")
             expect(content).toContain("--primary-color: #18181b")
             expect(content).toContain("--background-color: #fafafa")
+            expect(content).toContain("[data-mode=\"dark\"]")
             expect(content).toContain("--primary-color: #fafafa")
             expect(content).toContain("--background-color: #18181b")
         })

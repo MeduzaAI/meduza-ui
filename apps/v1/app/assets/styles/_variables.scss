@@ -1,8 +1,6 @@
-// Comprehensive design system variables matching spec 03
-// Colors will be injected by CLI based on user's base color choice
-
+// Comprehensive semantic CSS variables - no conflicts with user styles
 :root {
-    /* Colors - Semantic (injected by CLI) */
+    /* Colors - Semantic */
     --primary-color: #334155;
     --primary-foreground-color: #f8fafc;
     --secondary-color: #f1f5f9;
@@ -116,9 +114,6 @@
     --radius-3xl: 24px;
     --radius-full: 9999px;
 
-    /* Default radius for components */
-    --radius: 6px;
-
     /* Shadows - pixels */
     --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
     --shadow-base: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
@@ -142,8 +137,7 @@
     --z-tooltip: 1070;
 }
 
-[data-theme="dark"] {
-    /* Dark mode color overrides (injected by CLI) */
+[data-mode="dark"] {
     --primary-color: #e2e8f0;
     --primary-foreground-color: #0f172a;
     --secondary-color: #1e293b;
@@ -175,4 +169,94 @@
 
     --muted-color: #1e293b;
     --muted-foreground-color: #94a3b8;
+}
+
+/* brand-theme Theme */
+[data-theme="brand-theme"] {
+    --primary-color: #1d4ed8;
+    --primary-foreground-color: #eff6ff;
+    --secondary-color: #dbeafe;
+    --secondary-foreground-color: #1e3a8a;
+    --background-color: #ffffff;
+    --foreground-color: #1e3a8a;
+    --card-color: #ffffff;
+    --card-foreground-color: #1e3a8a;
+    --popover-color: #ffffff;
+    --popover-foreground-color: #1e3a8a;
+    --muted-color: #dbeafe;
+    --muted-foreground-color: #3b82f6;
+    --accent-color: #dbeafe;
+    --accent-foreground-color: #1e3a8a;
+    --destructive-color: #ef4444;
+    --destructive-foreground-color: #eff6ff;
+    --border-color: #bfdbfe;
+    --input-color: #bfdbfe;
+    --ring-color: #1e3a8a;
+}
+
+[data-theme="brand-theme"][data-mode="dark"] {
+    --primary-color: #60a5fa;
+    --primary-foreground-color: #1e3a8a;
+    --secondary-color: #1e3a8a;
+    --secondary-foreground-color: #eff6ff;
+    --background-color: #172554;
+    --foreground-color: #eff6ff;
+    --card-color: #172554;
+    --card-foreground-color: #eff6ff;
+    --popover-color: #172554;
+    --popover-foreground-color: #eff6ff;
+    --muted-color: #1e3a8a;
+    --muted-foreground-color: #60a5fa;
+    --accent-color: #1e3a8a;
+    --accent-foreground-color: #eff6ff;
+    --destructive-color: #dc2626;
+    --destructive-foreground-color: #eff6ff;
+    --border-color: #1e3a8a;
+    --input-color: #1e3a8a;
+    --ring-color: #93c5fd;
+}
+
+/* midnight-blue Theme */
+[data-theme="midnight-blue"] {
+    --primary-color: #1d4ed8;
+    --primary-foreground-color: #eff6ff;
+    --secondary-color: #dbeafe;
+    --secondary-foreground-color: #1e3a8a;
+    --background-color: #ffffff;
+    --foreground-color: #1e3a8a;
+    --card-color: #ffffff;
+    --card-foreground-color: #1e3a8a;
+    --popover-color: #ffffff;
+    --popover-foreground-color: #1e3a8a;
+    --muted-color: #dbeafe;
+    --muted-foreground-color: #3b82f6;
+    --accent-color: #dbeafe;
+    --accent-foreground-color: #1e3a8a;
+    --destructive-color: #ef4444;
+    --destructive-foreground-color: #eff6ff;
+    --border-color: #bfdbfe;
+    --input-color: #bfdbfe;
+    --ring-color: #1e3a8a;
+}
+
+[data-theme="midnight-blue"][data-mode="dark"] {
+    --primary-color: #60a5fa;
+    --primary-foreground-color: #1e3a8a;
+    --secondary-color: #1e3a8a;
+    --secondary-foreground-color: #eff6ff;
+    --background-color: #172554;
+    --foreground-color: #eff6ff;
+    --card-color: #172554;
+    --card-foreground-color: #eff6ff;
+    --popover-color: #172554;
+    --popover-foreground-color: #eff6ff;
+    --muted-color: #1e3a8a;
+    --muted-foreground-color: #60a5fa;
+    --accent-color: #1e3a8a;
+    --accent-foreground-color: #eff6ff;
+    --destructive-color: #dc2626;
+    --destructive-foreground-color: #eff6ff;
+    --border-color: #1e3a8a;
+    --input-color: #1e3a8a;
+    --ring-color: #93c5fd;
 }
