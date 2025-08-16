@@ -1,5 +1,5 @@
 /**
- * @name utils  
+ * @name utils
  * @description BEM className utility for Vue components
  * @type registry:lib
  * @dependencies []
@@ -37,38 +37,3 @@ export function useClassName(block: string): UseClassNameReturn {
         }
     };
 }
-
-// Simple utility for combining classes
-export function cn(...classes: (string | undefined | null | boolean | Record<string, boolean>)[]): string {
-    const result: string[] = [];
-
-    for (const cls of classes) {
-        if (!cls) continue;
-
-        if (typeof cls === 'string') {
-            result.push(cls);
-        } else if (typeof cls === 'object') {
-            for (const [key, value] of Object.entries(cls)) {
-                if (value) {
-                    result.push(key);
-                }
-            }
-        }
-    }
-
-    return result.join(' ');
-}
-
-export const metadata = {
-    name: "utils",
-    type: "registry:lib" as const,
-    description: "BEM className utility with configuration support for Vue components",
-    dependencies: [],
-    files: [
-        {
-            path: "lib/utils.ts",
-            type: "registry:lib" as const,
-            target: "lib/utils.ts"
-        }
-    ]
-};

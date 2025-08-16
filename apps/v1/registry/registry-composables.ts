@@ -9,9 +9,9 @@ export const composables: Registry["items"] = [
         files: [
             {
                 path: "composables/useTheme.ts",
-                type: "file",
+                type: "registry:composable",
                 content: "",
-                target: "composables/useTheme.ts"
+                target: "useTheme.ts"
             }
         ]
     }

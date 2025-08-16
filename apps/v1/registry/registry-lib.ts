@@ -11,7 +11,7 @@ export const lib: Registry["items"] = [
                 path: "/lib/utils.ts",
                 content: "", // Content will be filled by build script
                 type: "registry:lib",
-                target: "lib/utils.ts"
+                target: "utils.ts"
             }
         ]
     },

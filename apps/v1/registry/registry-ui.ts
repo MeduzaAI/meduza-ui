@@ -10,8 +10,8 @@ export const ui: RegistryItem[] = [
         files: [
             {
                 path: "ui/button.vue",
-                type: "file",
-                target: "components/ui/button.vue"
+                type: "registry:ui",
+                target: "button.vue"
             },
         ],
     },

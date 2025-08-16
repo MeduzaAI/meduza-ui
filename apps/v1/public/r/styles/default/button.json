@@ -1,5 +1,5 @@
 {
-  "$schema": "https://meduza-ui.com/schema/registry-item.json",
+  "$schema": "https://meduza-ui.dev/schema/registry-item.json",
   "name": "button",
   "type": "registry:ui",
   "description": "A flexible button component with multiple variants and sizes",
@@ -9,10 +9,10 @@
   ],
   "files": [
     {
-      "path": "ui/button.vue",
+      "path": "registry/default/ui/button.vue",
       "content": "<script setup lang=\"ts\">\nimport { computed } from 'vue'\nimport { useClassName } from '@/lib/utils'\n\n// Enums for type safety\nenum ButtonVariant {\n  Primary = 'primary',\n  Secondary = 'secondary',\n  Outline = 'outline',\n  Ghost = 'ghost',\n  Destructive = 'destructive'\n}\n\nenum ButtonSize {\n  Small = 'sm',\n  Medium = 'md',\n  Large = 'lg'\n}\n\ninterface ButtonProps {\n  variant?: ButtonVariant\n  size?: ButtonSize\n  disabled?: boolean\n  type?: 'button' | 'submit' | 'reset'\n}\n\nconst props = withDefaults(defineProps<ButtonProps>(), {\n  variant: ButtonVariant.Primary,\n  size: ButtonSize.Medium,\n  disabled: false,\n  type: 'button'\n})\n\n// Root class using component name in kebab-case\nconst { b } = useClassName('button')\n\nconst buttonClasses = computed(() => {\n  return b([\n    props.variant,\n    props.size,\n    { disabled: props.disabled }\n  ])\n})\n</script>\n\n<template>\n  <button\n    :class=\"buttonClasses\"\n    :disabled=\"disabled\"\n    :type=\"type\"\n    v-bind=\"$attrs\"\n  >\n    <slot />\n  </button>\n</template>\n\n<style lang=\"scss\" scoped>\n.button {\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  white-space: nowrap;\n  border-radius: calc(var(--radius) - 2px);\n  transition: colors 0.2s;\n  cursor: pointer;\n  border: 1px solid transparent;\n  font-weight: 500;\n  \n  &:focus-visible {\n    outline: 2px solid var(--ring-color);\n    outline-offset: 2px;\n  }\n  \n  // Variants using CSS variables directly\n  &--primary {\n    background-color: var(--primary-color);\n    color: var(--primary-foreground-color);\n    \n    &:hover:not(.button--disabled) {\n      opacity: 0.9;\n    }\n  }\n  \n  &--secondary {\n    background-color: var(--secondary-color);\n    color: var(--secondary-foreground-color);\n    \n    &:hover:not(.button--disabled) {\n      opacity: 0.8;\n    }\n  }\n  \n  &--outline {\n    border: 1px solid var(--border-color);\n    background-color: var(--background-color);\n    color: var(--foreground-color);\n    \n    &:hover:not(.button--disabled) {\n      background-color: var(--accent-color);\n      color: var(--accent-foreground-color);\n    }\n  }\n  \n  &--ghost {\n    background-color: transparent;\n    color: var(--foreground-color);\n    \n    &:hover:not(.button--disabled) {\n      background-color: var(--accent-color);\n      color: var(--accent-foreground-color);\n    }\n  }\n  \n  &--destructive {\n    background-color: var(--destructive-color);\n    color: var(--destructive-foreground-color);\n    \n    &:hover:not(.button--disabled) {\n      opacity: 0.9;\n    }\n  }\n  \n  // Sizes\n  &--sm {\n    height: 36px;\n    padding: 0 12px;\n    font-size: 0.875rem;\n  }\n  \n  &--md {\n    height: 40px;\n    padding: 0 16px;\n    font-size: 0.875rem;\n  }\n  \n  &--lg {\n    height: 44px;\n    padding: 0 24px;\n    font-size: 1rem;\n  }\n  \n  // States\n  &--disabled {\n    opacity: 0.5;\n    cursor: not-allowed;\n    pointer-events: none;\n  }\n}\n</style>\n",
-      "type": "file",
-      "target": "components/ui/button.vue"
+      "type": "registry:ui",
+      "target": "button.vue"
     }
   ]
 }

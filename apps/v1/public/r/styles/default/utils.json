@@ -1,15 +1,15 @@
 {
-  "$schema": "https://meduza-ui.com/schema/registry-item.json",
+  "$schema": "https://meduza-ui.dev/schema/registry-item.json",
   "name": "utils",
   "type": "registry:lib",
   "description": "BEM className utility for Vue components",
   "dependencies": [],
   "files": [
     {
-      "path": "/lib/utils.ts",
+      "path": "registry/default/lib/utils.ts",
       "content": "/**\n * @name utils\n * @description BEM className utility for Vue components\n * @type registry:lib\n * @dependencies []\n */\n\n// Types for simplified BEM className utility\ninterface UseClassNameReturn {\n    b: () => string;\n    e: (element: string, condition?: boolean) => string;\n    em: (element: string, modifier: string, condition?: boolean) => string;\n    m: (modifier: string, condition?: boolean) => string;\n}\n\nexport function useClassName(block: string): UseClassNameReturn {\n    return {\n        // Block: returns the base block name\n        b: (): string => block,\n\n        // Element: returns block__element (conditional if condition provided)\n        e: (element: string, condition?: boolean): string => {\n            if (condition === false) return '';\n            return `${block}__${element}`;\n        },\n\n        // Element with modifier: returns block__element--modifier (conditional if condition provided)\n        em: (element: string, modifier: string, condition?: boolean): string => {\n            if (condition === false) return '';\n            return `${block}__${element}--${modifier}`;\n        },\n\n        // Modifier: returns block--modifier (conditional if condition provided)\n        m: (modifier: string, condition?: boolean): string => {\n            if (condition === false) return '';\n            return `${block}--${modifier}`;\n        }\n    };\n}\n",
       "type": "registry:lib",
-      "target": "lib/utils.ts"
+      "target": "utils.ts"
     }
   ]
 }

@@ -50,9 +50,9 @@ vi.mock("../../utils/get-project-info", () => ({
     getProjectInfo: vi.fn(() =>
         Promise.resolve({
             framework: "vue",
-            type: "app",
-            srcDir: null,
-            srcPrefix: "",
+            baseDir: "",
+            isTypeScript: false,
+            packageManager: "npm",
             aliasPrefix: "@",
         })
     ),
@@ -61,26 +61,22 @@ vi.mock("../../utils/get-project-info", () => ({
 vi.mock("../../utils/get-config", () => ({
     getConfig: vi.fn(() => Promise.resolve(null)), // No existing config
     writeConfig: vi.fn(() => Promise.resolve()),
-    resolveConfigPaths: vi.fn((config, projectInfo) => {
-        const srcPrefix = projectInfo?.srcPrefix || ""
+    resolveConfigPaths: vi.fn((cwd, config) => {
+        const baseDir = config.aliases?.styles || "assets/styles"
         return {
             ...config,
-            scss: {
-                ...config.scss,
-                variables: `${srcPrefix}assets/styles/_variables.scss`,
-                mixins: `${srcPrefix}assets/styles/_mixins.scss`,
-                main: `${srcPrefix}assets/styles/main.scss`
-            },
             registries: {
                 "meduza-ui": "http://localhost:3000/r"
             },
             resolvedPaths: {
-                scssVariables: `${srcPrefix}assets/styles/_variables.scss`,
-                scssMixins: `${srcPrefix}assets/styles/_mixins.scss`,
-                components: `${srcPrefix}components`,
-                ui: `${srcPrefix}components/ui`,
-                lib: `${srcPrefix}lib`,
-                utils: `${srcPrefix}lib/utils.ts`
+                cwd: cwd,
+                components: join(cwd, "components"),
+                ui: join(cwd, "components/ui"),
+                lib: join(cwd, "lib"),
+                utils: join(cwd, "lib/utils"),
+                composables: join(cwd, "composables"),
+                assets: join(cwd, "assets"),
+                styles: join(cwd, baseDir)
             }
         }
     }),
@@ -143,12 +139,11 @@ describe("init command", () => {
         expect(cwd).toBe(testDir)
         expect(config.style).toBe("default")
         expect(config.baseColor).toBe("slate")
-        expect(config.scss.variables).toBeDefined()
-        expect(config.scss.mixins).toBeDefined()
         expect(config.aliases.components).toBeDefined()
         expect(config.aliases.ui).toBeDefined()
         expect(config.aliases.lib).toBeDefined()
         expect(config.aliases.utils).toBeDefined()
+        expect(config.aliases.styles).toBeDefined()
         expect(config.registries["meduza-ui"]).toBeDefined()
     })
 
@@ -175,10 +170,10 @@ describe("init command", () => {
         // Mock project info to have src directory
         const projectInfoWithSrc = {
             framework: "vue",
-            type: "app",
-            srcDir: "src",
-            srcPrefix: "src/",
-            aliasPrefix: "@/",
+            baseDir: "src",
+            isTypeScript: false,
+            packageManager: "npm",
+            aliasPrefix: "@",
         }
         vi.mocked(getProjectInfo).mockResolvedValueOnce(projectInfoWithSrc)
 
@@ -217,8 +212,7 @@ describe("init command", () => {
         const [, config] = vi.mocked(writeConfig).mock.calls[0] // First call in this test
 
         // Should use root-based paths since no src directory
-        expect(config.scss.variables).toBe("assets/styles/_variables.scss")
-        expect(config.scss.mixins).toBe("assets/styles/_mixins.scss")
+        expect(config.aliases.styles).toBe("assets/styles")
     })
 
     it("should refuse to overwrite existing config without force flag", async () => {
@@ -313,7 +307,7 @@ describe("init command", () => {
         })
 
         expect(addComponents).toHaveBeenCalledWith(
-            ["utils", "index"],
+            ["index"],
             expect.objectContaining({
                 registries: expect.objectContaining({
                     "meduza-ui": "http://localhost:3000/r",

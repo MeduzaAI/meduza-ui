@@ -1,48 +1,4 @@
 {
-  "inlineColors": {
-    "light": {
-      "background": "white",
-      "foreground": "stone-950",
-      "card": "white",
-      "card-foreground": "stone-950",
-      "popover": "white",
-      "popover-foreground": "stone-950",
-      "primary": "stone-900",
-      "primary-foreground": "stone-50",
-      "secondary": "stone-100",
-      "secondary-foreground": "stone-900",
-      "muted": "stone-100",
-      "muted-foreground": "stone-500",
-      "accent": "stone-100",
-      "accent-foreground": "stone-900",
-      "destructive": "red-500",
-      "destructive-foreground": "stone-50",
-      "border": "stone-200",
-      "input": "stone-200",
-      "ring": "stone-950"
-    },
-    "dark": {
-      "background": "stone-950",
-      "foreground": "stone-50",
-      "card": "stone-950",
-      "card-foreground": "stone-50",
-      "popover": "stone-950",
-      "popover-foreground": "stone-50",
-      "primary": "stone-50",
-      "primary-foreground": "stone-900",
-      "secondary": "stone-800",
-      "secondary-foreground": "stone-50",
-      "muted": "stone-800",
-      "muted-foreground": "stone-400",
-      "accent": "stone-800",
-      "accent-foreground": "stone-50",
-      "destructive": "red-900",
-      "destructive-foreground": "stone-50",
-      "border": "stone-800",
-      "input": "stone-800",
-      "ring": "stone-300"
-    }
-  },
   "cssVars": {
     "light": {
       "primary-color": "#1c1917",

@@ -19,10 +19,9 @@ describe("schema", () => {
 
         if (result.success) {
             expect(result.data.style).toBe("default")
-            expect(result.data.scss.variables).toBe("@/assets/styles/_variables.scss")
-            expect(result.data.scss.mixins).toBe("@/assets/styles/_mixins.scss")
             expect(result.data.aliases.components).toBe("@/components")
             expect(result.data.aliases.ui).toBe("@/components/ui")
+            expect(result.data.aliases.styles).toBe("@/assets/styles")
         }
     })
 

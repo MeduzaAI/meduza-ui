@@ -6,22 +6,22 @@ export const themes: RegistryItem[] = [
     type: "registry:style",
     description: "Base style system with SCSS variables and mixins",
     dependencies: ['sass'],
-    registryDependencies: ["utils"],
+    registryDependencies: ["utils", "useTheme"],
     files: [
       {
-        path: "assets/styles/_variables.scss",
-        type: "file",
-        target: "assets/styles/_variables.scss"
+        path: "styles/_variables.scss",
+        type: "registry:style",
+        target: "_variables.scss"
       },
       {
-        path: "assets/styles/_mixins.scss",
-        type: "file",
-        target: "assets/styles/_mixins.scss"
+        path: "styles/_mixins.scss",
+        type: "registry:style",
+        target: "_mixins.scss"
       },
       {
-        path: "assets/styles/_main.scss",
-        type: "file",
-        target: "assets/styles/main.scss"
+        path: "styles/_main.scss",
+        type: "registry:style",
+        target: "main.scss"
       }
     ],
     cssVars: {

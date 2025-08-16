@@ -63,9 +63,6 @@ export async function resolveConfigPaths(
         ...mergedConfig,
         resolvedPaths: {
             cwd,
-            scssVariables: path.resolve(cwd, mergedConfig.scss.variables),
-            scssMixins: path.resolve(cwd, mergedConfig.scss.mixins),
-            scssMain: path.resolve(cwd, mergedConfig.scss.main),
             components: await resolveAlias(cwd, mergedConfig.aliases.components, projectInfo),
             ui: await resolveAlias(cwd, mergedConfig.aliases.ui, projectInfo),
             lib: await resolveAlias(cwd, mergedConfig.aliases.lib, projectInfo),

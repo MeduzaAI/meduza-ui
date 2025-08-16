@@ -52,7 +52,7 @@ describe("Registry API", () => {
                             {
                                 path: "ui/button.vue",
                                 content: "<template><button>Button</button></template>",
-                                type: "file",
+                                type: "registry:ui",
                             },
                         ],
                     }),

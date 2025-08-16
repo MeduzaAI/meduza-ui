@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import Button from "@/../registry/default/ui/button.vue";
+import { Index } from "@@/registry/__index__"
+
+const Button = Index.button.component
 </script>
 
 <template>
@@ -10,12 +12,12 @@ import Button from "@/../registry/default/ui/button.vue";
     <main class="main">
       <slot />
 
-      <Button>Test Button</Button>
+      <component :is="Button">Test Button</component>
     </main>
   </div>
 </template>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .app {
   min-height: 100vh;
   display: flex;

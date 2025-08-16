@@ -3,9 +3,5 @@ export const availableStyles = [
     {
         name: "default",
         label: "Default"
-    },
-    {
-        name: "minimal",
-        label: "Minimal"
     }
 ];

@@ -120,10 +120,6 @@ describe("theme command", () => {
         mockConfig = {
             style: "default",
             baseColor: "slate",
-            scss: {
-                variables: "app/assets/styles/_variables.scss",
-                mixins: "app/assets/styles/_mixins.scss"
-            },
             aliases: {
                 components: "@/components",
                 ui: "@/components/ui",
@@ -134,12 +130,14 @@ describe("theme command", () => {
                 "meduza-ui": "http://localhost:3000/r/{name}.json"
             },
             resolvedPaths: {
-                scssVariables: join(testDir, "app/assets/styles/_variables.scss"),
-                scssMixins: join(testDir, "app/assets/styles/_mixins.scss"),
+                cwd: testDir,
                 components: join(testDir, "components"),
                 ui: join(testDir, "components/ui"),
                 lib: join(testDir, "lib"),
-                utils: join(testDir, "lib/utils.ts")
+                utils: join(testDir, "lib/utils.ts"),
+                composables: join(testDir, "composables"),
+                assets: join(testDir, "assets"),
+                styles: join(testDir, "app/assets/styles")
             }
         }
 
@@ -242,7 +240,7 @@ describe("theme command", () => {
                 "http://localhost:3000/r"
             )
             expect(vi.mocked(injectColorsIntoVariablesFile)).toHaveBeenCalledWith(
-                mockConfig.resolvedPaths.scssVariables,
+                join(testDir, "app/assets/styles/_variables.scss"),
                 expect.any(Object),
                 {
                     asTheme: true,
@@ -263,7 +261,7 @@ describe("theme command", () => {
             })
 
             expect(vi.mocked(injectColorsIntoVariablesFile)).toHaveBeenCalledWith(
-                mockConfig.resolvedPaths.scssVariables,
+                join(testDir, "app/assets/styles/_variables.scss"),
                 expect.any(Object),
                 {
                     asTheme: true,
@@ -284,7 +282,7 @@ describe("theme command", () => {
             })
 
             expect(vi.mocked(injectColorsIntoVariablesFile)).toHaveBeenCalledWith(
-                mockConfig.resolvedPaths.scssVariables,
+                join(testDir, "app/assets/styles/_variables.scss"),
                 expect.any(Object),
                 {
                     asTheme: false,
@@ -332,7 +330,7 @@ describe("theme command", () => {
             })
 
             expect(vi.mocked(injectColorsIntoVariablesFile)).toHaveBeenCalledWith(
-                mockConfig.resolvedPaths.scssVariables,
+                join(testDir, "app/assets/styles/_variables.scss"),
                 expect.any(Object),
                 {
                     asTheme: true,

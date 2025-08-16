@@ -20,7 +20,7 @@ vi.mock("@/registry/api", () => ({
                 path: `components/ui/${name}.vue`,
                 content: `<template><div class="${name}"><slot /></div></template>\n\n<script setup lang="ts">\n// ${name} component\n</script>\n\n<style lang="scss">\n.${name} {\n  // Component styles\n}\n</style>`,
                 type: "registry:ui",
-                target: `components/ui/${name}.vue`
+                target: `${name}.vue`
             }
         ],
     })),
@@ -43,11 +43,6 @@ describe("add command", () => {
         await fs.writeJson(join(testDir, "meduza.config.json"), {
             style: "default",
             baseColor: "slate",
-            scss: {
-                variables: "src/assets/styles/_variables.scss",
-                mixins: "src/assets/styles/_mixins.scss",
-                main: "src/assets/styles/main.scss",
-            },
             aliases: {
                 components: "@/components",
                 ui: "@/components/ui",

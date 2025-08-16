@@ -31,21 +31,6 @@ export const rawConfigSchema = z.object({
   style: z.string().default("default"),
   baseColor: z.string().optional(),
 
-  // SCSS configuration (Vue-specific)
-  scss: z
-    .object({
-      variables: z.string(),
-      mixins: z.string(),
-      main: z.string(),
-      // Optional global imports
-      imports: z.array(z.string()).optional(),
-    })
-    .default({
-      variables: "@/assets/styles/_variables.scss",
-      mixins: "@/assets/styles/_mixins.scss",
-      main: "@/assets/styles/main.scss",
-    }),
-
   // Path aliases
   aliases: z
     .object({
@@ -82,9 +67,6 @@ export const rawConfigSchema = z.object({
 export const configSchema = rawConfigSchema.extend({
   resolvedPaths: z.object({
     cwd: z.string(),
-    scssVariables: z.string(),
-    scssMixins: z.string(),
-    scssMain: z.string(),
     components: z.string(),
     ui: z.string(),
     lib: z.string(),
@@ -106,11 +88,6 @@ export const DEFAULT_REGISTRIES = {
 export const DEFAULT_CONFIG: RawConfig = {
   style: "default",
   baseColor: "slate",
-  scss: {
-    variables: "@/assets/styles/_variables.scss",
-    mixins: "@/assets/styles/_mixins.scss",
-    main: "@/assets/styles/main.scss",
-  },
   aliases: {
     components: "@/components",
     ui: "@/components/ui",
@@ -123,13 +100,20 @@ export const DEFAULT_CONFIG: RawConfig = {
   registries: DEFAULT_REGISTRIES,
 };
 
+export const registryItemTypeSchema = z.enum([
+  "registry:component",
+  "registry:ui",
+  "registry:composable",
+  "registry:lib",
+  "registry:theme",
+  "registry:style",
+]);
+
 // Registry file schema
 export const registryFileSchema = z.object({
   path: z.string(),
   content: z.string(),
-  type: z
-    .enum(["file", "registry:ui", "registry:lib", "registry:style"])
-    .default("file"),
+  type: registryItemTypeSchema,
   target: z.string().optional(),
 });
 
@@ -141,10 +125,6 @@ export const registryItemCssVarsSchema = z.object({
 
 // Base color schema for the colors registry (matching shadcn)
 export const registryBaseColorSchema = z.object({
-  inlineColors: z.object({
-    light: z.record(z.string(), z.string()),
-    dark: z.record(z.string(), z.string()),
-  }),
   cssVars: z.object({
     light: z.record(z.string(), z.string()),
     dark: z.record(z.string(), z.string()),
@@ -155,14 +135,7 @@ export const registryBaseColorSchema = z.object({
 export const registryItemSchema = z.object({
   $schema: z.string().optional(),
   name: z.string(),
-  type: z.enum([
-    "registry:component",
-    "registry:ui",
-    "registry:composable",
-    "registry:lib",
-    "registry:theme",
-    "registry:style",
-  ]),
+  type: registryItemTypeSchema,
   description: z.string().optional(),
   dependencies: z.array(z.string()).optional(),
   devDependencies: z.array(z.string()).optional(),
@@ -183,14 +156,7 @@ export const registrySchema = z.object({
 // Registry index schema (simplified registry item for listing)
 export const registryIndexItemSchema = z.object({
   name: z.string(),
-  type: z.enum([
-    "registry:component",
-    "registry:ui",
-    "registry:composable",
-    "registry:lib",
-    "registry:theme",
-    "registry:style",
-  ]),
+  type: registryItemTypeSchema,
   description: z.string().optional(),
   category: z.string().optional(),
 });

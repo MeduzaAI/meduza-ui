@@ -176,7 +176,7 @@ async function promptForConfig(
       type: "select",
       name: "baseColor",
       message: "Which base color would you like to use?",
-      choices: colors.map((color) => ({
+      choices: colors.map((color: any) => ({
         title: color.label,
         value: color.name,
         description: `Use ${color.label.toLowerCase()} as the base color`,
@@ -185,27 +185,11 @@ async function promptForConfig(
     },
     {
       type: "text",
-      name: "scssVariables",
-      message: "Where would you like to store your SCSS variables?",
+      name: "styles",
+      message: "Where would you like to store your styles?",
       initial: projectInfo.baseDir
-        ? `${projectInfo.baseDir}/assets/styles/_variables.scss`
-        : "assets/styles/_variables.scss",
-    },
-    {
-      type: "text",
-      name: "scssMixins",
-      message: "Where would you like to store your SCSS mixins?",
-      initial: projectInfo.baseDir
-        ? `${projectInfo.baseDir}/assets/styles/_mixins.scss`
-        : "assets/styles/_mixins.scss",
-    },
-    {
-      type: "text",
-      name: "scssMain",
-      message: "Where would you like to store your SCSS main file?",
-      initial: projectInfo.baseDir
-        ? `${projectInfo.baseDir}/assets/styles/main.scss`
-        : "assets/styles/main.scss",
+        ? `${projectInfo.baseDir}/assets/styles`
+        : "assets/styles",
     },
     {
       type: "text",
@@ -233,11 +217,6 @@ async function promptForConfig(
     $schema: "https://meduza-ui.com/schema.json",
     style: responses.style,
     baseColor: responses.baseColor,
-    scss: {
-      variables: responses.scssVariables,
-      mixins: responses.scssMixins,
-      main: responses.scssMain,
-    },
     aliases: {
       components: responses.components,
       ui: `${responses.components}/ui`,
@@ -245,7 +224,7 @@ async function promptForConfig(
       utils: responses.utils,
       composables: responses.composables,
       assets: `${aliasPrefix}/assets`,
-      styles: `${aliasPrefix}/assets/styles`,
+      styles: responses.styles,
     },
     framework: {
       type: projectInfo.framework,
@@ -265,17 +244,6 @@ function getDefaultConfig(
     $schema: "https://meduza-ui.com/schema.json",
     style: options.style,
     baseColor: options.baseColor || "slate",
-    scss: {
-      variables: baseDir
-        ? path.join(baseDir, "assets/styles/_variables.scss")
-        : "assets/styles/_variables.scss",
-      mixins: baseDir
-        ? path.join(baseDir, "assets/styles/_mixins.scss")
-        : "assets/styles/_mixins.scss",
-      main: baseDir
-        ? path.join(baseDir, "assets/styles/main.scss")
-        : "assets/styles/main.scss",
-    },
     aliases: {
       components: `${aliasPrefix}/components`,
       ui: `${aliasPrefix}/components/ui`,
@@ -283,7 +251,9 @@ function getDefaultConfig(
       utils: `${aliasPrefix}/lib/utils`,
       composables: `${aliasPrefix}/composables`,
       assets: `${aliasPrefix}/assets`,
-      styles: `${aliasPrefix}/assets/styles`,
+      styles: baseDir
+        ? path.join(baseDir, "assets/styles")
+        : "assets/styles",
     },
     framework: {
       type: projectInfo.framework,
@@ -297,10 +267,7 @@ async function installBaseComponents(
   options: z.infer<typeof initOptionsSchema>,
 ) {
   // Install base utilities and styles
-  const baseComponents = [
-    "utils", // useClassName utility and cn helper
-    "index", // Base style configuration with theme variables
-  ];
+  const baseComponents = ["index"]; // Base style configuration with theme variables
 
   await addComponents(baseComponents, config, {
     overwrite: true,
@@ -338,7 +305,11 @@ async function injectColorVariables(
     const colorData = await fetchColorData(baseColor, baseUrl);
 
     // Inject colors into the existing variables file (created by registry)
-    await injectColorsIntoVariablesFile(config.resolvedPaths.scssVariables, colorData);
+    const variablesPath = path.resolve(
+      config.resolvedPaths.styles,
+      "_variables.scss",
+    );
+    await injectColorsIntoVariablesFile(variablesPath, colorData);
 
     if (!options.silent) {
       logger.stopSpinner(true, `Injected ${baseColor} color variables.`);
@@ -394,7 +365,7 @@ async function addMainScssImport(
     const content = await fs.readFile(mainFilePath, "utf8");
 
     // Check if the import already exists
-    const mainScssPath = config.resolvedPaths.scssMain;
+    const mainScssPath = path.resolve(config.resolvedPaths.styles, "main.scss");
     const relativePath = path.relative(
       path.dirname(mainFilePath),
       mainScssPath,
@@ -462,7 +433,7 @@ async function addNuxtScssImport(
   const content = await fs.readFile(configPath, "utf8");
 
   // Get the relative path to main.scss from the config file
-  const mainScssPath = config.resolvedPaths.scssMain;
+  const mainScssPath = path.resolve(config.resolvedPaths.styles, "main.scss");
   const relativePath = path.relative(process.cwd(), mainScssPath);
 
   // Check if CSS import already exists

@@ -24,16 +24,13 @@ describe("updateFiles", () => {
         mockConfig = {
             style: "default",
             baseColor: "slate",
-            scss: {
-                variables: "@/assets/styles/_variables.scss",
-                mixins: "@/assets/styles/_mixins.scss",
-                main: "@/assets/styles/main.scss",
-            },
+
             aliases: {
                 components: "@/components",
                 ui: "@/components/ui",
                 lib: "@/lib",
                 utils: "@/lib/utils",
+                styles: "@/assets/styles",
             },
             framework: {
                 type: "vue",
@@ -43,9 +40,6 @@ describe("updateFiles", () => {
             },
             resolvedPaths: {
                 cwd: testDir,
-                scssVariables: join(testDir, "assets/styles/_variables.scss"),
-                scssMixins: join(testDir, "assets/styles/_mixins.scss"),
-                scssMain: join(testDir, "assets/styles/main.scss"),
                 components: join(testDir, "components"),
                 ui: join(testDir, "components/ui"),
                 lib: join(testDir, "lib"),
@@ -68,7 +62,7 @@ describe("updateFiles", () => {
                 path: "ui/button.vue",
                 content: "<template><button>Button</button></template>",
                 type: "registry:ui",
-                target: "ui/button.vue",
+                target: "button.vue",
             },
         ]
 
@@ -86,7 +80,7 @@ describe("updateFiles", () => {
                 path: "lib/utils.ts",
                 content: "export const cn = () => {}",
                 type: "registry:lib",
-                target: "lib/utils.ts",
+                target: "utils.ts",
             },
         ]
 
@@ -103,14 +97,14 @@ describe("updateFiles", () => {
             {
                 path: "assets/styles/_variables.scss",
                 content: ":root { --primary: blue; }",
-                type: "file",
-                target: "assets/styles/_variables.scss",
+                type: "registry:style",
+                target: "_variables.scss",
             },
             {
                 path: "assets/styles/_mixins.scss",
                 content: "@mixin focus-ring { outline: 2px solid blue; }",
-                type: "file",
-                target: "assets/styles/_mixins.scss",
+                type: "registry:style",
+                target: "_mixins.scss",
             },
         ]
 
@@ -142,7 +136,7 @@ describe("updateFiles", () => {
                 path: "ui/button.vue",
                 content: "new content",
                 type: "registry:ui",
-                target: "ui/button.vue",
+                target: "button.vue",
             },
         ]
 
@@ -167,7 +161,7 @@ describe("updateFiles", () => {
                 path: "ui/button.vue",
                 content: "new content",
                 type: "registry:ui",
-                target: "ui/button.vue",
+                target: "button.vue",
             },
         ]
 
@@ -184,7 +178,7 @@ describe("updateFiles", () => {
                 path: "ui/forms/input.vue",
                 content: "<template><input /></template>",
                 type: "registry:ui",
-                target: "ui/forms/input.vue",
+                target: "forms/input.vue",
             },
         ]
 
@@ -200,7 +194,7 @@ describe("updateFiles", () => {
             {
                 path: "custom/file.ts",
                 content: "export const custom = true",
-                type: "file",
+                type: "registry:unknown" as any,
                 target: "custom/file.ts",
             },
         ]

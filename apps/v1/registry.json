@@ -12,8 +12,9 @@
       "files": [
         {
           "path": "registry/default/ui/button.vue",
-          "type": "file",
-          "target": "components/ui/button.vue"
+          "type": "registry:ui",
+          "target": "button.vue",
+          "content": ""
         }
       ]
     },
@@ -24,9 +25,10 @@
       "dependencies": [],
       "files": [
         {
-          "path": "registry/default//lib/utils.ts",
-          "type": "file",
-          "target": "lib/utils.ts"
+          "path": "registry/default/lib/utils.ts",
+          "content": "",
+          "type": "registry:lib",
+          "target": "utils.ts"
         }
       ]
     },
@@ -34,25 +36,31 @@
       "name": "index",
       "type": "registry:style",
       "description": "Base style system with SCSS variables and mixins",
-      "dependencies": [],
+      "dependencies": [
+        "sass"
+      ],
       "registryDependencies": [
-        "utils"
+        "utils",
+        "useTheme"
       ],
       "files": [
         {
-          "path": "registry/styles/_variables.scss",
-          "type": "file",
-          "target": "assets/styles/_variables.scss"
+          "path": "registry/default/styles/_variables.scss",
+          "type": "registry:style",
+          "target": "_variables.scss",
+          "content": ""
         },
         {
-          "path": "registry/styles/_mixins.scss",
-          "type": "file",
-          "target": "assets/styles/_mixins.scss"
+          "path": "registry/default/styles/_mixins.scss",
+          "type": "registry:style",
+          "target": "_mixins.scss",
+          "content": ""
         },
         {
-          "path": "registry/styles/_main.scss",
-          "type": "file",
-          "target": "assets/styles/main.scss"
+          "path": "registry/default/styles/_main.scss",
+          "type": "registry:style",
+          "target": "main.scss",
+          "content": ""
         }
       ],
       "cssVars": {
@@ -75,6 +83,20 @@
           "border-color": "#334155"
         }
       }
+    },
+    {
+      "name": "useTheme",
+      "description": "Enhanced theme management composable with support for both light/dark modes and custom themes",
+      "type": "registry:composable",
+      "dependencies": [],
+      "files": [
+        {
+          "path": "registry/default/composables/useTheme.ts",
+          "type": "registry:composable",
+          "content": "",
+          "target": "useTheme.ts"
+        }
+      ]
     }
   ]
 }

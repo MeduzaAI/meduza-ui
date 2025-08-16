@@ -12,57 +12,70 @@ export const Index: Record<string, any> = {
     type: "registry:ui",
     registryDependencies: ["utils"],
     files: [{
-      path: "registry/default/ui/button.vue",
-      type: "file",
-      target: "components/ui/button.vue"
+      path: "@@/registry/default/ui/button.vue",
+      type: "registry:ui",
+      target: "button.vue"
     }],
     component: Vue.defineAsyncComponent(async () => {
-      const mod = await import("@/registry/default/ui/button.vue")
+      const mod = await import("@@/registry/default/ui/button.vue")
       return mod.default || mod
     }),
-    categories: undefined,
-    meta: undefined,
+    category: "",
   },
   "utils": {
     name: "utils",
     description: "BEM className utility for Vue components",
     type: "registry:lib",
-    registryDependencies: undefined,
+    registryDependencies: [],
     files: [{
-      path: "registry/default//lib/utils.ts",
-      type: "file",
-      target: "lib/utils.ts"
+      path: "@@/registry/default//lib/utils.ts",
+      type: "registry:lib",
+      target: "utils.ts"
     }],
     component: Vue.defineAsyncComponent(async () => {
-      const mod = await import("@/registry/default//lib/utils.ts")
+      const mod = await import("@@/registry/default//lib/utils.ts")
       return mod.default || mod
     }),
-    categories: undefined,
-    meta: undefined,
+    category: "",
   },
   "index": {
     name: "index",
     description: "Base style system with SCSS variables and mixins",
     type: "registry:style",
-    registryDependencies: ["utils"],
+    registryDependencies: ["utils","useTheme"],
     files: [{
-      path: "registry/default/assets/styles/_variables.scss",
-      type: "file",
-      target: "assets/styles/_variables.scss"
+      path: "@@/registry/default/styles/_variables.scss",
+      type: "registry:style",
+      target: "_variables.scss"
     },{
-      path: "registry/default/assets/styles/_mixins.scss",
-      type: "file",
-      target: "assets/styles/_mixins.scss"
+      path: "@@/registry/default/styles/_mixins.scss",
+      type: "registry:style",
+      target: "_mixins.scss"
     },{
-      path: "registry/default/assets/styles/_main.scss",
-      type: "file",
-      target: "assets/styles/_main.scss"
+      path: "@@/registry/default/styles/_main.scss",
+      type: "registry:style",
+      target: "main.scss"
     }],
     component: Vue.defineAsyncComponent(async () => {
-      const mod = await import("@/registry/default/assets/styles/_variables.scss")
+      const mod = await import("@@/registry/default/styles/_variables.scss")
       return mod.default || mod
     }),
-    categories: undefined,
-    meta: undefined,
+    category: "",
   },
-  }
+  "useTheme": {
+    name: "useTheme",
+    description: "Enhanced theme management composable with support for both light/dark modes and custom themes",
+    type: "registry:composable",
+    registryDependencies: [],
+    files: [{
+      path: "@@/registry/default/composables/useTheme.ts",
+      type: "registry:composable",
+      target: "useTheme.ts"
+    }],
+    component: Vue.defineAsyncComponent(async () => {
+      const mod = await import("@@/registry/default/composables/useTheme.ts")
+      return mod.default || mod
+    }),
+    category: "",
+  },
+}

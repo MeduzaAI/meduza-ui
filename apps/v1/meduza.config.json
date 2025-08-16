@@ -2,11 +2,6 @@
   "$schema": "https://meduza-ui.com/schema.json",
   "style": "default",
   "baseColor": "slate",
-  "scss": {
-    "variables": "app/assets/styles/_variables.scss",
-    "mixins": "app/assets/styles/_mixins.scss",
-    "main": "app/assets/styles/main.scss"
-  },
   "aliases": {
     "components": "@/components",
     "ui": "@/components/ui",
@@ -14,7 +9,7 @@
     "utils": "@/lib/utils",
     "composables": "@/composables",
     "assets": "@/assets",
-    "styles": "@/assets/styles"
+    "styles": "app/assets/styles"
   },
   "framework": {
     "type": "nuxt"

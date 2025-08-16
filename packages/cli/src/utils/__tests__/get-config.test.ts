@@ -52,11 +52,6 @@ describe("get-config", () => {
         it("should return parsed config when valid config found", async () => {
             const mockConfig = {
                 style: "custom",
-                scss: {
-                    variables: "@/styles/_variables.scss",
-                    mixins: "@/styles/_mixins.scss",
-                    main: "@/styles/main.scss",
-                },
                 aliases: {
                     components: "@/components",
                     ui: "@/components/ui",
@@ -82,7 +77,6 @@ describe("get-config", () => {
             const mockExplorer = {
                 search: vi.fn().mockResolvedValue({
                     config: {
-                        scss: "invalid", // Invalid schema - should be object
                         aliases: "invalid" // Invalid schema - should be object
                     },
                     filepath: "/test/project/meduza.config.json"
@@ -131,11 +125,6 @@ describe("get-config", () => {
         it("should resolve paths correctly", async () => {
             const mockConfig = {
                 style: "default",
-                scss: {
-                    variables: "@/assets/styles/_variables.scss",
-                    mixins: "@/assets/styles/_mixins.scss",
-                    main: "@/assets/styles/main.scss",
-                },
                 aliases: {
                     components: "@/components",
                     ui: "@/components/ui",
@@ -151,9 +140,6 @@ describe("get-config", () => {
 
             expect(result.resolvedPaths).toEqual({
                 cwd: "/test/project",
-                scssVariables: "/test/project/@/assets/styles/_variables.scss",
-                scssMixins: "/test/project/@/assets/styles/_mixins.scss",
-                scssMain: "/test/project/@/assets/styles/main.scss",
                 components: "/test/project/components",
                 ui: "/test/project/components/ui",
                 lib: "/test/project/lib",
@@ -167,11 +153,7 @@ describe("get-config", () => {
         it("should prefer src directory when it exists", async () => {
             const mockConfig = {
                 style: "default",
-                scss: {
-                    variables: "@/assets/styles/_variables.scss",
-                    mixins: "@/assets/styles/_mixins.scss",
-                    main: "@/assets/styles/main.scss",
-                },
+
                 aliases: {
                     components: "@/components",
                     ui: "@/components/ui",
@@ -197,11 +179,7 @@ describe("get-config", () => {
         it("should merge with default registries", async () => {
             const mockConfig = {
                 style: "default",
-                scss: {
-                    variables: "@/assets/styles/_variables.scss",
-                    mixins: "@/assets/styles/_mixins.scss",
-                    main: "@/assets/styles/main.scss",
-                },
+
                 aliases: {
                     components: "@/components",
                     ui: "@/components/ui",
@@ -237,11 +215,7 @@ describe("get-config", () => {
         it("should return resolved config when raw config found", async () => {
             const mockConfig = {
                 style: "default",
-                scss: {
-                    variables: "@/assets/styles/_variables.scss",
-                    mixins: "@/assets/styles/_mixins.scss",
-                    main: "@/assets/styles/main.scss",
-                },
+
                 aliases: {
                     components: "@/components",
                     ui: "@/components/ui",
@@ -270,11 +244,7 @@ describe("get-config", () => {
         it("should write config to meduza.config.json", async () => {
             const config = {
                 style: "default",
-                scss: {
-                    variables: "@/assets/styles/_variables.scss",
-                    mixins: "@/assets/styles/_mixins.scss",
-                    main: "@/assets/styles/main.scss",
-                },
+
                 aliases: {
                     components: "@/components",
                     ui: "@/components/ui",
