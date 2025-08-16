@@ -1,14 +1,16 @@
 // Comprehensive semantic CSS variables - no conflicts with user styles
 :root {
+    --radius: 0.625rem;
+
     /* Colors - Semantic */
-    --primary-color: #334155;
-    --primary-foreground-color: #f8fafc;
-    --secondary-color: #f1f5f9;
-    --secondary-foreground-color: #0f172a;
-    --accent-color: #3b82f6;
-    --accent-foreground-color: #ffffff;
-    --destructive-color: #ef4444;
-    --destructive-foreground-color: #ffffff;
+    --primary-color: oklch(0.205 0 0);
+    --primary-foreground-color: oklch(0.985 0 0);
+    --secondary-color: oklch(0.97 0 0);
+    --secondary-foreground-color: oklch(0.205 0 0);
+    --accent-color: oklch(0.97 0 0);
+    --accent-foreground-color: oklch(0.205 0 0);
+    --destructive-color: oklch(0.577 0.245 27.325);
+    --destructive-foreground-color: oklch(1 0 0);
     --warning-color: #f59e0b;
     --warning-foreground-color: #ffffff;
     --success-color: #10b981;
@@ -17,24 +19,44 @@
     --info-foreground-color: #ffffff;
 
     /* Surface colors */
-    --background-color: #ffffff;
-    --foreground-color: #0f172a;
-    --surface-color: #ffffff;
-    --surface-foreground-color: #0f172a;
-    --card-color: #ffffff;
-    --card-foreground-color: #0f172a;
-    --popover-color: #ffffff;
-    --popover-foreground-color: #0f172a;
+    --background-color: oklch(1 0 0);
+    --foreground-color: oklch(0.145 0 0);
+    --surface-color: oklch(0.98 0 0);
+    --surface-foreground-color: oklch(0.145 0 0);
+    --card-color: oklch(1 0 0);
+    --card-foreground-color: oklch(0.145 0 0);
+    --popover-color: oklch(1 0 0);
+    --popover-foreground-color: oklch(0.145 0 0);
 
     /* Border and outline */
-    --border-color: #e2e8f0;
-    --input-color: #e2e8f0;
-    --ring-color: #3b82f6;
-    --outline-color: #94a3b8;
+    --border-color: oklch(0.922 0 0);
+    --input-color: oklch(0.922 0 0);
+    --ring-color: oklch(0.708 0 0);
+    --outline-color: oklch(0.708 0 0);
 
     /* Muted colors */
-    --muted-color: #f8fafc;
-    --muted-foreground-color: #64748b;
+    --muted-color: oklch(0.97 0 0);
+    --muted-foreground-color: oklch(0.556 0 0);
+
+    /* Sidebar colors */
+    --sidebar-color: oklch(0.985 0 0);
+    --sidebar-foreground-color: oklch(0.145 0 0);
+    --sidebar-primary-color: oklch(0.205 0 0);
+    --sidebar-primary-foreground-color: oklch(0.985 0 0);
+    --sidebar-accent-color: oklch(0.97 0 0);
+    --sidebar-accent-foreground-color: oklch(0.205 0 0);
+    --sidebar-border-color: oklch(0.922 0 0);
+    --sidebar-ring-color: oklch(0.708 0 0);
+
+    /* Code colors */
+    --code-color: oklch(0.98 0 0);
+    --code-foreground-color: oklch(0.145 0 0);
+    --code-highlight-color: oklch(0.96 0 0);
+    --code-number-color: oklch(0.56 0 0);
+
+    /* Selection colors */
+    --selection-color: oklch(0.145 0 0);
+    --selection-foreground-color: oklch(1 0 0);
 
     /* Spacing - comprehensive scale in pixels */
     --spacing-0: 0px;
@@ -63,8 +85,8 @@
     --spacing-32: 128px;
 
     /* Typography - semantic naming */
-    --font-heading: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-heading: --system-ui, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-body: --system-ui, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     --font-mono: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', monospace;
 
     /* Font sizes - pixels */
@@ -138,37 +160,57 @@
 }
 
 [data-mode="dark"] {
-    --primary-color: #e2e8f0;
-    --primary-foreground-color: #0f172a;
-    --secondary-color: #1e293b;
-    --secondary-foreground-color: #f8fafc;
-    --accent-color: #60a5fa;
-    --accent-foreground-color: #1e293b;
-    --destructive-color: #f87171;
-    --destructive-foreground-color: #1e293b;
-    --warning-color: #fbbf24;
-    --warning-foreground-color: #1e293b;
-    --success-color: #34d399;
-    --success-foreground-color: #1e293b;
-    --info-color: #22d3ee;
-    --info-foreground-color: #1e293b;
+    --primary-color: oklch(0.922 0 0);
+    --primary-foreground-color: oklch(0.205 0 0);
+    --secondary-color: oklch(0.269 0 0);
+    --secondary-foreground-color: oklch(0.985 0 0);
+    --accent-color: oklch(0.371 0 0);
+    --accent-foreground-color: oklch(0.985 0 0);
+    --destructive-color: oklch(0.704 0.191 22.216);
+    --destructive-foreground-color: oklch(1 0 0);
+    --warning-color: #f59e0b;
+    --warning-foreground-color: #000000;
+    --success-color: #22c55e;
+    --success-foreground-color: #000000;
+    --info-color: #06b6d4;
+    --info-foreground-color: #000000;
 
-    --background-color: #0f172a;
-    --foreground-color: #f8fafc;
-    --surface-color: #1e293b;
-    --surface-foreground-color: #f8fafc;
-    --card-color: #1e293b;
-    --card-foreground-color: #f8fafc;
-    --popover-color: #1e293b;
-    --popover-foreground-color: #f8fafc;
+    --background-color: oklch(0.145 0 0);
+    --foreground-color: oklch(0.985 0 0);
+    --surface-color: oklch(0.2 0 0);
+    --surface-foreground-color: oklch(0.708 0 0);
+    --card-color: oklch(0.205 0 0);
+    --card-foreground-color: oklch(0.985 0 0);
+    --popover-color: oklch(0.269 0 0);
+    --popover-foreground-color: oklch(0.985 0 0);
 
-    --border-color: #334155;
-    --input-color: #334155;
-    --ring-color: #60a5fa;
-    --outline-color: #64748b;
+    --border-color: oklch(1 0 0 / 10%);
+    --input-color: oklch(1 0 0 / 15%);
+    --ring-color: oklch(0.556 0 0);
+    --outline-color: oklch(0.556 0 0);
 
-    --muted-color: #1e293b;
-    --muted-foreground-color: #94a3b8;
+    --muted-color: oklch(0.269 0 0);
+    --muted-foreground-color: oklch(0.708 0 0);
+
+    /* Sidebar colors - dark mode */
+    --sidebar-color: oklch(0.205 0 0);
+    --sidebar-foreground-color: oklch(0.985 0 0);
+    --sidebar-primary-color: oklch(0.488 0.243 264.376);
+    --sidebar-primary-foreground-color: oklch(0.985 0 0);
+    --sidebar-accent-color: oklch(0.269 0 0);
+    --sidebar-accent-foreground-color: oklch(0.985 0 0);
+    --sidebar-border-color: oklch(1 0 0 / 10%);
+    --sidebar-ring-color: oklch(0.439 0 0);
+
+    /* Code colors - dark mode */
+    --code-color: oklch(0.2 0 0);
+    --code-foreground-color: oklch(0.708 0 0);
+    --code-highlight-color: oklch(0.27 0 0);
+    --code-number-color: oklch(0.72 0 0);
+
+    /* Selection colors - dark mode */
+    --selection-color: oklch(0.922 0 0);
+    --selection-foreground-color: oklch(0.205 0 0);
 }
 
 /* midnight-blue Theme */

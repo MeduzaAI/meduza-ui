@@ -1,36 +1,28 @@
 <script setup lang="ts">
-import { Index } from "@@/registry/__index__"
+import { useClassName } from "@/lib/utils";
 
-const Button = Index.button.component
+const cn = useClassName('layout-default')
 </script>
 
 <template>
-  <div class="app">
-    <header class="header">
-      <h1>Meduza UI</h1>
-    </header>
-    <main class="main">
-      <slot />
+  <div :class="cn.b()">
+    <DocsHeader />
 
-      <component :is="Button">Test Button</component>
+    <main :class="cn.e('main')">
+      <slot />
     </main>
   </div>
 </template>
 
 <style lang="scss">
-.app {
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--background-color);
+}
+
+.layout-default {
+  font-family: var(--font-body);
   min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
-
-.header {
-  padding: 1rem;
-  border-bottom: 1px solid #e2e8f0;
-}
-
-.main {
-  flex: 1;
-  padding: 1rem;
 }
 </style>
